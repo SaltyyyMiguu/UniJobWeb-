@@ -13,6 +13,12 @@ const {
   deactivateAccount,
 } = require('../controllers/companyController');
 
+// Public company profile — deliberately outside the COMPANY-only gate below,
+// since its real caller is a STUDENT viewing a company they applied to (see
+// getPublicCompanyProfile for the per-request ownership check that replaces
+// role-gating here — same reasoning as studentRoutes' /public/:studentId).
+router.get('/public/:companyId', authenticateToken, getPublicCompanyProfile);
+
 router.use(authenticateToken, authorizeRoles('COMPANY'));
 
 router.get('/dashboard', getDashboard);
@@ -35,7 +41,5 @@ router.get('/unread-count', getUnreadCount);
 router.get('/notifications/count', getNewApplicantCount);
 router.post('/notifications/mark-seen', markApplicantsSeen);
 router.delete('/account', deactivateAccount);
-// Public company profile (for students to view)
-router.get('/public/:companyId', getPublicCompanyProfile);
 
 module.exports = router;

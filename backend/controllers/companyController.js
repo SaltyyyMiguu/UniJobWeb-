@@ -619,15 +619,39 @@ const setInterviewSlots = async (req, res) => {
   }
 };
 
-// ─── GET /api/company/:companyId/public-profile ───────────────────────────────
-// Read-only company profile for students to view from Applications page
+// ─── GET /api/company/public/:companyId ───────────────────────────────────────
+// Read-only company profile — the only real caller is a STUDENT viewing a
+// company from their Applications page. Returns fields beyond what public job
+// search already exposes (ssmNumber, phone, address), so — same reasoning as
+// studentController's getPublicStudentProfile — this needs a real ownership
+// check rather than "any logged-in user can fetch any ID": a student may only
+// view companies they've actually applied to.
 const getPublicCompanyProfile = async (req, res) => {
   try {
     const company = await Company.findByPk(req.params.companyId, {
       attributes: { exclude: ['userId'] },
     });
     if (!company) return res.status(404).json({ message: 'Company not found.' });
-    res.json(company);
+
+    if (req.user.role === 'ADMIN') {
+      return res.json(company);
+    }
+
+    if (req.user.role === 'STUDENT') {
+      const student = await Student.findOne({ where: { userId: req.user.id } });
+      if (!student) return res.status(404).json({ message: 'Student profile not found.' });
+
+      const hasApplied = await Application.findOne({
+        where: { studentId: student.id },
+        include: [{ model: JobPosting, where: { companyId: company.id }, attributes: [] }],
+      });
+      if (!hasApplied) {
+        return res.status(403).json({ message: 'You can only view profiles of companies you applied to.' });
+      }
+      return res.json(company);
+    }
+
+    return res.status(403).json({ message: 'Not authorized to view this profile.' });
   } catch (error) {
     console.error('[Failed to fetch company profile.] DB error:', error);
     res.status(500).json({ message: 'Internal server error. Please try again later.' });

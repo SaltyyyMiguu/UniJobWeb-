@@ -642,16 +642,40 @@ const confirmInterviewSlot = async (req, res) => {
   }
 };
 
-// ─── GET /api/student/:studentId/public-profile ───────────────────────────────
-// Read-only student profile for company to view
+// ─── GET /api/student/public/:studentId ───────────────────────────────────────
+// Read-only student profile — the only real caller is a COMPANY reviewing an
+// applicant (ApplicantPipelinePanel / CompanyATS). This returns real PII
+// (email, phone, resumeUrl, ucsiId), so unlike most /public/ routes it needs
+// a real authorization check, not just "any logged-in user can fetch any ID":
+// a company may only view students who have actually applied to one of its
+// own job postings; nobody else (including other students) has a legitimate
+// reason to pull an arbitrary student's profile by ID.
 const getPublicStudentProfile = async (req, res) => {
   try {
     const student = await Student.findByPk(req.params.studentId, {
       include: [{ model: User, attributes: ['email'] }],
-      attributes: { exclude: [] }
     });
     if (!student) return res.status(404).json({ message: 'Student not found.' });
-    res.json(student);
+
+    if (req.user.role === 'ADMIN') {
+      return res.json(student);
+    }
+
+    if (req.user.role === 'COMPANY') {
+      const company = await Company.findOne({ where: { userId: req.user.id } });
+      if (!company) return res.status(404).json({ message: 'Company profile not found.' });
+
+      const hasApplied = await Application.findOne({
+        where: { studentId: student.id },
+        include: [{ model: JobPosting, where: { companyId: company.id }, attributes: [] }],
+      });
+      if (!hasApplied) {
+        return res.status(403).json({ message: 'You can only view profiles of students who applied to your job postings.' });
+      }
+      return res.json(student);
+    }
+
+    return res.status(403).json({ message: 'Not authorized to view this profile.' });
   } catch (error) {
     console.error('[Failed to fetch student profile.] DB error:', error);
     res.status(500).json({ message: 'Internal server error. Please try again later.' });

@@ -9,6 +9,14 @@ const {
   getPublicStudentProfile, deactivateAccount,
 } = require('../controllers/studentController');
 
+// Public student profile — deliberately outside the STUDENT-only gate below,
+// since its real caller is a COMPANY viewing an applicant (see
+// getPublicStudentProfile for the per-request ownership check that replaces
+// role-gating here: a blanket STUDENT-only restriction would 403 every
+// legitimate company caller while doing nothing to stop one student from
+// pulling another student's PII by guessing/observing a studentId).
+router.get('/public/:studentId', authenticateToken, getPublicStudentProfile);
+
 router.use(authenticateToken, authorizeRoles('STUDENT'));
 
 router.get('/dashboard', getDashboard);
@@ -29,7 +37,5 @@ router.get('/notifications/count', getUpdateCount);
 router.post('/notifications/mark-seen', markUpdatesSeen);
 router.get('/notifications/hired-celebration', getHiredCelebration);
 router.delete('/account', deactivateAccount);
-// Public student profile (accessible by company via this student route, or directly)
-router.get('/public/:studentId', getPublicStudentProfile);
 
 module.exports = router;
