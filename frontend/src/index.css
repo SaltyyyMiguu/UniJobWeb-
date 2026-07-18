@@ -1,0 +1,1678 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UniJobLink Design System — Clean Professional
+   Inspired by: minimal editorial aesthetic with sharp geometry
+   Primary: UCSI Crimson #C41E3A | Sharp 0px radius | Inter typeface
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Colour Tokens ───────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  --bg:        #F7F7F5;
+  --surface:   #FFFFFF;
+  --surface-2: #F2F2F0;
+  --border:    #E5E5E3;
+  --border-2:  #D0D0CE;
+  --txt-1:     #111111;
+  --txt-2:     #555555;
+  --txt-3:     #999999;
+  --red:       #C41E3A;
+  --red-dim:   rgba(196,30,58,0.08);
+  --red-border:rgba(196,30,58,0.22);
+  --navy:      #1A2235;
+  --green:     #1A7F5A;
+  --green-dim: rgba(26,127,90,0.08);
+  --amber:     #B45309;
+  --amber-dim: rgba(180,83,9,0.08);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+  /* Layered elevation — tactile "lift on hover, press on click" depth */
+  --lift-rest:  0 1px 2px rgba(17,17,17,0.05), inset 0 1px 0 rgba(255,255,255,0.6);
+  --lift-hover: 0 4px 10px rgba(17,17,17,0.07), 0 16px 32px rgba(17,17,17,0.10), inset 0 1px 0 rgba(255,255,255,0.7);
+  --lift-press: 0 1px 2px rgba(17,17,17,0.10), inset 0 1px 3px rgba(17,17,17,0.08);
+}
+
+[data-theme="dark"] {
+  --bg:        #0C0C0E;
+  --surface:   #141416;
+  --surface-2: #1C1C1F;
+  --border:    #2A2A2E;
+  --border-2:  #38383D;
+  --txt-1:     #F0F0EE;
+  --txt-2:     #A0A09E;
+  --txt-3:     #606060;
+  --red:       #E02347;
+  --red-dim:   rgba(224,35,71,0.10);
+  --red-border:rgba(224,35,71,0.25);
+  --navy:      #E8ECF4;
+  --green:     #34D399;
+  --green-dim: rgba(52,211,153,0.10);
+  --amber:     #FBB839;
+  --amber-dim: rgba(251,184,57,0.10);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
+  --lift-rest:  0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  --lift-hover: 0 4px 10px rgba(0,0,0,0.35), 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  --lift-press: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 4px rgba(0,0,0,0.45);
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+html { background: var(--bg); color: var(--txt-1); }
+body {
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--txt-1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s, color 0.2s;
+}
+#root { min-height: 100vh; background: var(--bg); }
+
+/* ── Typography scale ────────────────────────────────────────────────────── */
+h1,h2,h3,h4,h5,h6 { margin: 0; color: var(--txt-1); letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-2); }
+@media (hover: hover) {
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+}
+
+/* ── Button system ───────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  border: 1px solid transparent; cursor: pointer;
+  transition: all 0.15s ease; white-space: nowrap;
+  border-radius: 0;
+}
+.btn-primary {
+  background: var(--red); color: #fff; border-color: var(--red);
+}
+.btn-outline {
+  background: transparent; color: var(--txt-1); border-color: var(--border-2);
+}
+.btn-ghost {
+  background: transparent; color: var(--txt-2); border-color: transparent;
+}
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: #A01830; border-color: #A01830;
+    box-shadow: 0 0 0 3px var(--red-border);
+  }
+  .btn-outline:hover {
+    background: var(--surface-2); border-color: var(--border-2);
+  }
+  .btn-ghost:hover { background: var(--surface-2); color: var(--txt-1); }
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-lg { padding: 11px 24px; font-size: 14px; }
+
+/* ── Input system ────────────────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--txt-1);
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus { border-color: var(--red); }
+.input::placeholder { color: var(--txt-3); }
+.input-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--txt-3);
+  margin-bottom: 6px;
+}
+
+/* Email + Send/Verify OTP button, side-by-side. .input defaults to
+   width:100%, which would make it fight the button for space in a flex
+   row — overridden here (no !important needed, this selector is already
+   more specific) so the input takes the remaining space via flex:1 and the
+   button keeps its natural content width. */
+.otp-row {
+  display: flex;
+  gap: 8px;
+  /* Default align-items:stretch — the button/badge naturally matches the
+     input's height (34px desktop, 52px mobile via .auth-mobile-input)
+     without hardcoding a height on either side. */
+}
+.otp-row .input {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+}
+.otp-row .btn {
+  flex-shrink: 0;
+}
+
+/* ── Card system ─────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+.card-accent-l { border-left: 3px solid var(--red); }
+
+/* Tactile elevation — card lifts off the surface on hover, presses back down on click */
+.card-hover {
+  box-shadow: var(--lift-rest);
+  transition: box-shadow 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.28s cubic-bezier(0.16,1,0.3,1);
+  will-change: transform;
+}
+@media (hover: hover) {
+  .card-hover:hover {
+    box-shadow: var(--lift-hover);
+    transform: translateY(-5px);
+  }
+}
+.card-hover:active {
+  box-shadow: var(--lift-press);
+  transform: translateY(-1px);
+  transition-duration: 0.08s;
+}
+
+/* ── Badge / tag ─────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; border-radius: 0;
+}
+.badge-red   { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-border); }
+.badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(26,127,90,0.25); }
+.badge-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(180,83,9,0.25); }
+.badge-muted { background: var(--surface-2); color: var(--txt-2); border: 1px solid var(--border); }
+.badge-blue  { background: rgba(29,78,216,0.08); color: #1D4ED8;  border: 1px solid rgba(29,78,216,0.25); }
+
+/* ── Modal close button ──────────────────────────────────────────────────────
+   Shared by every dismissible modal/panel/drawer in the app (JobDetailModal,
+   PdfViewerModal, ApplicantPipelinePanel, Saved Jobs drawer, profile modals).
+   A plain "ghost icon" close button (no background/border, color:var(--txt-3))
+   used to be nearly invisible in dark mode — this is the fix, made reusable. */
+.modal-close-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--txt-1);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.modal-close-btn:hover {
+  background: var(--border);
+  border-color: var(--border-2);
+}
+/* Variant for buttons sitting on a hardcoded dark gradient banner (profile
+   modal headers) rather than a themed surface — the banner doesn't invert in
+   light mode, so this keeps a light icon/translucent chip instead of var(--txt-1). */
+.modal-close-btn--on-banner {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+}
+.modal-close-btn--on-banner:hover {
+  background: rgba(255,255,255,0.22);
+}
+
+/* ── Section header ──────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--txt-3);
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--txt-1);
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 22px;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--border); }
+
+/* ── Stat card ───────────────────────────────────────────────────────────── */
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+}
+.stat-card .stat-num {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--txt-1);
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--txt-3);
+  margin-top: 6px;
+}
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+}
+.modal-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  width: 100%; max-width: 640px;
+  max-height: 90vh; overflow-y: auto;
+}
+
+/* ── Compact action modals (Confirm/Offer/Password/InterviewSlot) ──────────
+   These render their own fixed-position overlay + .card panel rather than
+   using .modal-overlay/.modal-panel, so they need their own bounded-height
+   + scroll rule — otherwise a phone's on-screen keyboard can push their
+   content taller than the viewport with no way to reach it. ─────────────── */
+.compact-modal-panel {
+  max-height: min(90vh, 90dvh);
+  overflow-y: auto;
+}
+
+/* ── Layer panel — a "popout" overlay that sits above the page, which stays
+   visible-but-blurred behind it (used for the Saved Jobs drawer, etc.) ──── */
+@keyframes layer-pop-in {
+  0%   { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.layer-overlay {
+  position: fixed; inset: 0; z-index: 45;
+  background: rgba(10,10,12,0.45);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.layer-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--lift-hover), 0 30px 60px rgba(0,0,0,0.25);
+  width: 100%; max-width: 960px;
+  max-height: 86vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: layer-pop-in 0.28s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Sidebar nav ─────────────────────────────────────────────────────────── */
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  font-size: 13px; font-weight: 500;
+  color: var(--txt-2);
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .nav-item:hover { color: var(--txt-1); background: var(--surface-2); }
+}
+.nav-item.active {
+  color: var(--txt-1); font-weight: 600;
+  border-left-color: var(--red);
+  background: var(--red-dim);
+}
+
+/* ── Save button (tactile "3D touch" chip) ──────────────────────────────────
+   Resting: flat chip barely off the surface.
+   Hover:   pops up + grows a soft diffuse shadow, like it's floating.
+   Active:  presses down instantly, shadow tucks inward.
+   Saved:   stays "pressed in" — filled, with an inset shadow instead of a
+            raised one, so the depth itself communicates the toggled state. */
+.save-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--txt-3);
+  font-size: 11px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--lift-rest);
+  transition: box-shadow 0.22s cubic-bezier(0.16,1,0.3,1), transform 0.22s cubic-bezier(0.16,1,0.3,1), color 0.15s, border-color 0.15s;
+  will-change: transform;
+}
+@media (hover: hover) {
+  .save-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: var(--lift-hover);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+}
+.save-btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: var(--lift-press);
+  transition-duration: 0.08s;
+}
+.save-btn.is-saved {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: var(--lift-press);
+  transform: translateY(0);
+}
+@media (hover: hover) {
+  .save-btn.is-saved:hover {
+    background: #A01830;
+    border-color: #A01830;
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--lift-hover);
+  }
+}
+
+/* ── Avatar ──────────────────────────────────────────────────────────────── */
+.avatar {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--red); color: #fff;
+  font-weight: 700; flex-shrink: 0;
+}
+.avatar-upload-ring {
+  position: relative; cursor: pointer;
+}
+@media (hover: hover) {
+  .avatar-upload-ring:hover .avatar-overlay { opacity: 1; }
+}
+.avatar-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s;
+  color: #fff; font-size: 11px; font-weight: 600;
+}
+
+/* ── Job slider ──────────────────────────────────────────────────────────── */
+@keyframes slide {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.slider-track {
+  display: flex;
+  animation: slide 36s linear infinite;
+}
+@media (hover: hover) {
+  .slider-track:hover { animation-play-state: paused; }
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+.table-clean {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table-clean th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--txt-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.table-clean td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--txt-2);
+  vertical-align: middle;
+}
+@media (hover: hover) {
+  .table-clean tr:hover td { background: var(--surface-2); }
+}
+
+/* Admin User Management's whole mobile card (avatar + name + subtitle +
+   tags, all as real nested <div>s inside one table cell — see section 8b)
+   has no equivalent on desktop, so it's hidden here by default and only
+   switched on inside the mobile media query. */
+.admin-user-card-cell {
+  display: none;
+}
+
+/* Mirror of .desktop-only-text — labels that only make sense once buttons
+   go full-width on mobile (desktop keeps its original compact icon-only
+   buttons). */
+.mobile-only-text {
+  display: none;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────────── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* standard property for compatibility */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.text-red { color: var(--red); }
+.text-muted { color: var(--txt-3); }
+.text-2 { color: var(--txt-2); }
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   GLOBAL VIEWPORT SAFETY — prevents accidental horizontal page scroll.
+   Inert on desktop: it only ever matters if something overflows, and nothing
+   in the desktop layout does, so this changes no existing visual behaviour.
+   ═════════════════════════════════════════════════════════════════════════════ */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* New mobile-only structures — inert (hidden) by default so they have zero
+   effect on desktop; each is switched on inside the max-width:768px block. */
+.bottom-nav,
+.pipeline-container {
+  display: none;
+}
+
+/* ── Responsive class utilities (Tailwind-style, hand-rolled, !important) ───────
+   Tailwind DOES compile every md:/max-md: class used in this project (verified
+   directly in the built CSS). The real bug: Tailwind's utilities ship without
+   !important, so a class like `max-md:ml-0` can never win against a competing
+   inline `style={{ marginLeft: '220px' }}` — inline styles always outrank a
+   plain class in CSS specificity, regardless of source order. These explicit
+   !important rules exist only for the handful of classes that fight an inline
+   style value (currently just `max-md:ml-0`, resetting the sidebar's desktop
+   offset margin on mobile — the "ghost sidebar" bug). The rest are redundant
+   with Tailwind's own output and kept only as defensive belt-and-suspenders,
+   matching its computed values exactly. ── */
+@media (max-width: 767px) {
+  .hidden { display: none !important; }
+  .md\:flex { display: none !important; }
+  .md\:hidden { display: flex !important; }
+  .max-md\:hidden { display: none !important; }
+  .max-md\:flex { display: flex !important; }
+  .max-md\:ml-0 { margin-left: 0 !important; }
+}
+
+@media (min-width: 768px) {
+  .hidden { display: none !important; }
+  .md\:flex { display: flex !important; }
+  .md\:hidden { display: none !important; }
+  .max-md\:hidden { display: flex !important; }
+  .max-md\:flex { display: none !important; }
+  .md\:flex-shrink-0 { flex-shrink: 0 !important; }
+  .md\:h-\[calc\(100vh-230px\)\] { height: calc(100vh - 230px) !important; }
+  .md\:px-8 { padding-left: 32px !important; padding-right: 32px !important; }
+  .md\:py-7 { padding-top: 28px !important; padding-bottom: 28px !important; }
+  .md\:translate-x-0 { transform: translateX(0) !important; }
+  .md\:w-\[230px\] { width: 230px !important; }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   MASTER MOBILE UX REFACTOR (max-width: 768px)
+   Every rule below is gated behind this media query. Desktop (> 768px) is
+   never touched by anything in this block — no base classes are redefined
+   outside a media query, and no attribute-selector hacks are used (those
+   previously broke desktop chat by matching unrelated inline styles).
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     1. Typography & base spacing
+     ───────────────────────────────────────────────────────────────────────── */
+  h1 { font-size: 18px !important; }
+  h2 { font-size: 16px !important; }
+  h3 { font-size: 15px !important; }
+  h4 { font-size: 13px !important; }
+  p  { font-size: 13px !important; line-height: 1.5 !important; }
+
+  .card {
+    padding: 24px 16px !important;
+    margin-bottom: 10px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Interactive/accented cards keep their own border + tactile press shadow
+     (job cards, dashboard stat tiles with a colored left accent) — only the
+     plain outline cards (forms, profile sections, table wrappers) get the
+     new borderless soft-shadow treatment. */
+  .card:not(.card-hover):not(.card-accent-l) {
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  }
+
+  /* Full-bleed modal panels manage their own internal padding — the sticky
+     header banner must stay flush edge-to-edge, so restore padding:0 after
+     the blanket .card reskin above. */
+  .mobile-modal-panel {
+    padding: 0 !important;
+  }
+
+  .stat-card { padding: 12px 14px !important; }
+  .stat-num  { font-size: 18px !important; }
+  .stat-label{ font-size: 10px !important; }
+  .badge     { font-size: 10px !important; padding: 3px 6px !important; }
+
+  table   { font-size: 12px !important; }
+  th, td  { padding: 8px !important; }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     2. Touch targets — Material Design 48px minimum
+     ───────────────────────────────────────────────────────────────────────── */
+  input, select, textarea {
+    font-size: 16px !important; /* prevents iOS auto-zoom on focus */
+    padding: 12px 14px !important;
+    min-height: 48px !important;
+    width: 100% !important;
+    border-radius: 12px !important;
+  }
+
+  .btn {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 12px 18px !important;
+    border-radius: 12px !important;
+  }
+
+  .btn-sm {
+    min-height: 44px !important;
+    padding: 10px 14px !important;
+  }
+
+  a, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Opts out of the blanket 44px touch-target minimum above — a sliding
+     switch is deliberately smaller than a tap button; iOS's own dark-mode
+     switch is ~31px tall, not 44px. */
+  .theme-toggle {
+    min-height: 28px !important;
+    min-width: 50px !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     3. Data grids — Job cards / applicant cards / dashboard cards stack 1-up
+     Applied via explicit .mobile-stack-grid class on the grid containers
+     (NOT via attribute selectors — those matched too broadly and broke chat).
+     ───────────────────────────────────────────────────────────────────────── */
+  .mobile-stack-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     4. "Thumb Zone" Native Navigation — bottom nav bar + hidden sidebar
+     ───────────────────────────────────────────────────────────────────────── */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    z-index: 9999;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    min-height: 48px;
+    padding: 4px 2px;
+    color: var(--txt-3);
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    position: relative;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--red);
+  }
+
+  .bottom-nav-badge {
+    position: absolute;
+    top: 0; right: calc(50% - 18px);
+    background: var(--red);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 4px;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* The "ghost sidebar" fix, made robust: the routed content wrapper (marked
+     with .main-content-wrapper in each layout) must fully release the
+     desktop sidebar's reserved space and never exceed the viewport width.
+     Also carries the bottom-nav clearance so scrolled-to-bottom content
+     (and its buttons) is never hidden behind the fixed bottom bar. */
+  .main-content-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden;
+    padding-bottom: 90px !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     5. App-like modals — full-screen takeovers on mobile
+     ───────────────────────────────────────────────────────────────────────── */
+  .modal-panel,
+  .layer-panel,
+  .mobile-modal-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+  }
+
+  /* Modals must dominate the stacking context — sit above the bottom nav
+     (z-index: 9999) so the nav bar is fully hidden while a modal is open. */
+  .modal-overlay,
+  .layer-overlay,
+  .mobile-modal-overlay {
+    padding: 0 !important;
+    inset: 0 !important;
+    z-index: 99999 !important;
+  }
+
+  /* Sticky header inside full-screen modals, so Close (X) stays reachable
+     while the body content scrolls underneath it. */
+  .modal-panel > div:first-child,
+  .layer-panel > div:first-child,
+  .mobile-modal-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+  }
+  /* .modal-panel/.layer-panel headers have no background of their own, so
+     give them the card's surface color while sticky-scrolled. .mobile-modal-
+     header is excluded — it always sets its own gradient background inline
+     (profile modals), and forcing var(--surface) here used to clobber that
+     gradient entirely on mobile, silently breaking it in EVERY theme and
+     leaving the header's white icon/text with no contrast in light mode. */
+  .modal-panel > div:first-child,
+  .layer-panel > div:first-child {
+    background: var(--surface) !important;
+  }
+
+  /* Footer of a full-screen modal must clear the iOS home-indicator gesture bar. */
+  .modal-panel > div:last-child,
+  .mobile-modal-panel > div:last-child {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     5b. PDF viewer popup — deliberately its own class names (not .layer-panel/
+     .mobile-modal-panel) so it is NOT swept into the full-screen-takeover rule
+     above. This one stays a small centered popout box even on mobile, per
+     explicit user request — it only ever renders on mobile in the first place
+     (desktop keeps opening PDFs in a new tab via window.open).
+     ───────────────────────────────────────────────────────────────────────── */
+  .pdf-viewer-overlay {
+    position: fixed; inset: 0; z-index: 999999 !important;
+    background: rgba(10,10,12,0.75);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .pdf-viewer-panel {
+    width: 100%; max-width: 480px;
+    height: 82vh; height: 82dvh;
+    max-height: 640px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: layer-pop-in 0.24s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     6. ATS Pipeline — retired the horizontal swipe Kanban on mobile in favor
+     of a single clean vertical list (matching the Student History tab). The
+     Kanban was always a mobile-only view (desktop never had one — desktop
+     shows .ats-applicant-grid, a plain flat grid, unconditionally); rather
+     than showing the Kanban here, we now just let that same flat grid show
+     on mobile too, since its own grid-template (auto-fill/minmax) already
+     collapses to a single column on a narrow screen. .pipeline-container
+     reverts to its base display:none (defined near the top of this file)
+     by simply not overriding it here anymore.
+     ───────────────────────────────────────────────────────────────────────── */
+  .ats-applicant-grid {
+    gap: 16px !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     7. Search / filter inputs — chunky rounded pills (data-table toolbars only,
+     scoped via .pill-input rather than the shared .input class so login,
+     profile-edit, and every other form on the site keeps its sharp 0px-radius
+     desktop styling untouched)
+     ───────────────────────────────────────────────────────────────────────── */
+  .pill-input {
+    border-radius: 14px !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     8. Table-to-Card — data tables (Students/Companies/Supervisors lists)
+     collapse into stacked cards instead of horizontal-scrolling on mobile.
+     Desktop is untouched: .table-clean stays a real <table> above 768px,
+     this block only fires inside the existing max-width:768px media query.
+     ───────────────────────────────────────────────────────────────────────── */
+  .table-clean thead {
+    display: none;
+  }
+
+  .table-clean, .table-clean tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .table-clean tr {
+    display: flex !important;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .table-clean td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    max-width: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+
+  .table-clean td:last-child {
+    border-bottom: none;
+  }
+
+  .table-clean td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--txt-3);
+    text-align: left;
+    padding-right: 12px;
+    flex-shrink: 0;
+  }
+
+  /* A colSpan "No results" row is a single centered message, not a
+     label/value pair — reset it out of the card-row layout above. */
+  .table-clean td[colspan] {
+    display: block !important;
+    text-align: center !important;
+  }
+  .table-clean td[colspan]::before {
+    content: none;
+  }
+
+  /* Action-button cells (Edit/Reset Password/Archive) carry no data-label —
+     the buttons themselves are self-explanatory — so they're right-aligned
+     and set off from the data rows above like the wireframe's CTA row. */
+  .table-clean td.mobile-card-actions {
+    justify-content: flex-end;
+    border-bottom: none;
+    padding-top: 12px !important;
+  }
+  .table-clean td.mobile-card-actions::before {
+    content: none;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     8b. Admin User Management — purpose-built mobile card, scoped entirely
+     under .admin-user-table so it can never affect SupervisorDashboard.jsx or
+     AdminStudentTracker.jsx, which also use .table-clean but not this class.
+     Placed after section 8 so equal-specificity selectors here win on source
+     order.
+
+     Structural note: avatar + name + subtitle + tags now live as real
+     nested <div>s inside ONE table cell (.admin-user-card-cell), not as
+     three separate <td> siblings coordinated by flex `order` tricks (the
+     earlier approach). That old approach technically measured out flush-left
+     correctly, but it relied on a fragile "hypothetical flex-basis:0%"
+     workaround (a tr::after pseudo-element forcing a line break) to stop a
+     long name from starving itself of width — normal block/flex nesting
+     inside a single cell doesn't have that failure mode at all, so it's
+     simpler AND more robust. The desktop <table> columns (Student/Company/
+     Supervisor name, UCSI ID, Faculty, etc.) are untouched, just hidden on
+     mobile via .admin-user-meta-hide-mobile since this cell replaces them
+     visually.
+     ───────────────────────────────────────────────────────────────────────── */
+  .admin-user-table.table-clean tr {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    padding: 16px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .admin-user-status-cell,
+  .admin-user-meta-hide-mobile {
+    display: none !important;
+  }
+
+  .admin-user-card-cell {
+    display: block !important;
+    flex-basis: 100% !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+  .admin-user-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .admin-card-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+    gap: 2px;
+    min-width: 0;
+  }
+  .admin-card-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--txt-1);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .admin-card-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--txt-3);
+  }
+
+  /* Tag row — a direct sibling of .admin-card-header (not nested inside the
+     identity column), so it drops to its own new line flush with the card's
+     left padding / the avatar's left edge, not indented under the name. */
+  .admin-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .admin-meta-tag {
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+  }
+  /* Plain informational tags (Faculty/Industry names etc.) have no inherent
+     state color, so they get a neutral soft-gray treatment; tags that ARE a
+     real state (Active, Verified, Approved…) instead pair .admin-meta-tag
+     with the existing .badge-green/-amber/-red/-muted classes, so the
+     status tag comes out green-tinted for free from the same system every
+     other status pill in this app already uses — no separate color logic
+     needed here. */
+  .admin-meta-tag-neutral {
+    background: var(--surface-2) !important;
+    color: var(--txt-1) !important;
+    border: 1px solid var(--border) !important;
+  }
+
+  /* Meta fields that still show as their own plain text line (Email — too
+     long/variable to read well as a tag). Stays a separate <td> (not folded
+     into .admin-user-card-cell) since it needs its own full-width line
+     below the card cell, same as Actions. */
+  .admin-user-meta-cell {
+    order: 3;
+    flex-basis: 100% !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    margin: 8px 0 0 !important;
+    font-size: 14px !important;
+    color: var(--txt-2) !important;
+  }
+  .admin-user-meta-cell::before {
+    content: none !important;
+  }
+  .admin-user-meta-label {
+    color: var(--txt-3);
+    flex-shrink: 0;
+  }
+
+  /* Actions — one compact row, solid soft-tinted backgrounds instead of
+     hollow borders (which read as "empty" at this size), all three buttons
+     equal width. */
+  .admin-user-table .mobile-card-actions.admin-user-actions,
+  .admin-card-actions {
+    order: 4;
+    flex-basis: 100% !important;
+    margin-top: 12px;
+    padding-top: 12px !important;
+    border-top: 1px solid var(--border);
+  }
+  .admin-user-actions > div {
+    width: 100%;
+    flex-direction: row !important;
+    gap: 8px !important;
+  }
+  .admin-user-actions > div > button,
+  .admin-card-actions button {
+    flex: 1 !important;
+    min-height: 36px !important;
+    padding: 0 10px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    text-align: center;
+    font-size: 12px !important;
+    background: var(--surface-2) !important;
+    border: none !important;
+    color: var(--txt-1) !important;
+  }
+  .admin-user-actions > div > button.is-danger {
+    background: var(--red-dim) !important;
+    color: var(--red) !important;
+  }
+  .admin-user-actions > div > button.is-success {
+    background: var(--green-dim) !important;
+    color: var(--green) !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     9. Auth flow (Login / Register) — scoped classes, not the shared
+     .card/.input/.btn classes, so this reskin can't leak onto desktop or
+     onto any other page that also uses .card/.input/.btn.
+     ───────────────────────────────────────────────────────────────────────── */
+  .auth-mobile-card {
+    border-radius: 20px !important;
+    border: none !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04) !important;
+    padding: 32px 24px !important;
+    background: var(--surface) !important;
+  }
+  .auth-mobile-input {
+    min-height: 52px !important;
+    border-radius: 12px !important;
+    background-color: var(--surface-2) !important;
+    border: none !important;
+    padding: 0 16px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+  .auth-mobile-btn {
+    min-height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+  }
+
+  /* Registration OTP row (email input + Send/Verify button) reuses
+     .auth-mobile-input/.auth-mobile-btn for their chunky 52px sizing — same
+     tokens as the rest of the auth forms — but the row's whole point is
+     that the input and button sit side-by-side, so their width:100%
+     !important is overridden back to auto here. Sizing/radius/font-size
+     from the rules above still apply since these are additive overrides. */
+  .otp-row .auth-mobile-input,
+  .otp-row .auth-mobile-btn {
+    width: auto !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     10. Student Job Search dashboard & Job Detail Modal
+     ───────────────────────────────────────────────────────────────────────── */
+  .mobile-dash-filters {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+  }
+  /* The filter row's own margin-bottom is zeroed above and re-declared here
+     on .mobile-search-card instead (same element, both classes) — this rule
+     just has to stay textually after .mobile-dash-filters so its 16px wins
+     the tie. Also slashes the inherited .card padding (24px 16px) down to a
+     single compact value — that padding was eating a huge chunk of the
+     viewport on a phone. */
+  .mobile-search-card {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  /* Each stacked field/button is a direct flex child spaced by the gap above.
+     The keyword input's wrapper div still carries its desktop flex-basis
+     (flex: 1 1 200px, meant for the old row layout, where 200px sized its
+     WIDTH) — in the new column layout that same basis is read as a MINIMUM
+     HEIGHT, ballooning the wrapper into a huge empty box. Reset flex-basis
+     on every stacked child (and zero any stray margin) so each one sizes to
+     its natural content height instead. */
+  .mobile-dash-filters > * {
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  .mobile-chunky-input {
+    min-height: 52px !important;
+    border-radius: 12px !important;
+    background-color: var(--surface-2) !important;
+    border: none !important;
+    padding: 0 16px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+  }
+  /* The keyword search field has an absolutely-positioned icon at left:10px —
+     give it extra left clearance so typed text doesn't render under it. */
+  .mobile-chunky-input.has-icon {
+    padding-left: 40px !important;
+  }
+
+  .mobile-job-card {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    border-radius: 20px !important;
+    border: none !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04) !important;
+    padding: 16px !important;
+    background: var(--surface) !important;
+    margin-bottom: 16px !important;
+    transform: none !important; /* kill any leftover .card-hover lift/press transform on touch */
+  }
+  /* JobCard manages its own internal header/body/footer padding — the
+     footer's distinct background + top border must stay flush against the
+     card's edges to span full width, so restore padding:0 on the outer
+     wrapper after the blanket .mobile-job-card padding above. The ACTUAL
+     visual bulk on mobile comes from the body's own inline padding (16px),
+     not this outer wrapper — .job-card-body below is the real compaction. */
+  .card.card-hover.mobile-job-card {
+    padding: 0 !important;
+  }
+  .job-card-body {
+    padding: 12px !important;
+  }
+  /* Belt-and-suspenders: the hover cover image is already never rendered on
+     mobile (gated in JS by canHover), but force-hide it by class too in
+     case that JS gate is ever bypassed. */
+  .job-card-cover {
+    transform: none !important;
+    opacity: 0 !important;
+    display: none !important;
+    transition: none !important;
+  }
+
+  /* Category/Location/Salary tag row — force wrap so badges never overflow
+     the card's width on a narrow screen. */
+  .job-card-tags {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* "Hover a card to preview" only makes sense with a cursor. */
+  .desktop-only-text {
+    display: none !important;
+  }
+  .mobile-only-text {
+    display: inline !important;
+  }
+
+  .mobile-chunky-btn {
+    min-height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+  }
+
+  /* Job Detail Modal's Apply footer — sticky within the modal's own scroll
+     container so the primary CTA stays reachable without scrolling. Uses
+     the theme's own surface color (matching .modal-panel's background)
+     instead of a hardcoded white, so it blends with the modal body instead
+     of clashing in dark mode. Stacked vertically because the CTA button is
+     now full-width (.mobile-chunky-btn) and can no longer share its row
+     with the job title/company text. */
+  .job-modal-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: var(--surface) !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     11. Student Applications — application cards
+     ───────────────────────────────────────────────────────────────────────── */
+  .mobile-app-card {
+    position: relative !important;
+    border-radius: 20px !important;
+    /* Not a blanket border:none — ApplicationCard's outer div carries a
+       dynamic inline borderLeft (status-accent color, e.g. green=Offered,
+       blue=Interview, red=Rejected). border:none !important would win over
+       that inline value too and erase a real status signal, so only the
+       other three sides are cleared here. */
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04) !important;
+    padding: 20px 16px !important;
+    background: var(--surface) !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* No absolute positioning anywhere below. The badge is reset to a plain
+     in-flow element — its own natural (fit-content) width, no offsets.
+     Sized up for visual prominence, and pinned to render first — order:-1
+     is what actually moves it above .mobile-app-header on mobile without
+     touching its DOM position (see the base-level order rules below the
+     media query, which is what keeps desktop showing it beside the header
+     instead). */
+  .mobile-app-card .badge {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    width: fit-content !important;
+    display: flex !important;
+    order: -1 !important;
+    align-self: flex-start !important;
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Safe side-by-side header (Logo + Text) */
+  .mobile-app-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    width: 100% !important;
+    order: 0 !important;
+  }
+  .app-card-status-actions {
+    order: 1 !important;
+    flex-basis: auto !important;
+    width: 100% !important;
+  }
+  /* Sized via this explicit class rather than ".mobile-app-header
+     img/[class*='logo']/[class*='avatar']" — there's no bare <img> when a
+     company has no logo (falls back to a plain letter avatar div), and no
+     element anywhere in this component has "logo" or "avatar" in its class
+     name. app-card-logo already sits on the real logo container in both
+     card layouts (added a few rounds back). */
+  .app-card-logo {
+    width: 56px !important;
+    height: 56px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+  }
+  /* Text column — min-width:0 is what actually lets it shrink/wrap instead
+     of forcing the row wider than the card (a flex item's default min-width
+     is auto, i.e. "never smaller than my content," which is what blows out
+     a row like this one). Targets the real text-block class rather than a
+     blind ".mobile-app-header > div" — that selector also matches the
+     History card's logo box and badge column, which are ALSO direct <div>
+     children of its header, and would wrongly force them into this same
+     column layout. */
+  .app-card-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+  /* The title is a <p>, not an <h3> — no element in this component is an
+     <h3>, so that selector would never have matched anything. */
+  .mobile-app-title {
+    font-size: 16px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
+  }
+  .app-card-meta {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Fix Actions & Resume/Offer-letter links. margin-top stays "auto", not
+     the flat 8px this round's snippet suggested — auto is what actually
+     pushes this to the bottom of the card's column flex layout; a fixed
+     8px would leave it wherever it falls in normal flow instead, which is
+     the opposite of "anchored to bottom". */
+  .mobile-app-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    position: relative !important;
+    z-index: 50 !important; /* clears local siblings without threatening a modal's own stacking tier */
+  }
+  .mobile-app-resume-link {
+    position: relative !important;
+    z-index: 50 !important; /* clears local siblings without threatening a modal's own stacking tier */
+    pointer-events: auto !important; /* guarantee it's tappable regardless of a parent's pointer-events */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    min-height: 48px !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 0 16px !important;
+    margin: 0 !important; /* .mobile-app-actions' own 12px gap already spaces multiple links out */
+    width: 100% !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    color: var(--txt-1) !important;
+    text-decoration: none !important;
+  }
+
+  /* Interview Invitations box — slot-selection rows and the Confirm button
+     stack cleanly instead of cramming together. */
+  .interview-slot-label {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+  .interview-confirm-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     11b. Job Listings — "list view" row, shared between Company Manage Jobs
+     and Student Browse Jobs (base/desktop rules for these classes live
+     outside this media query, further down this file). Desktop keeps the
+     compact single-line row; mobile gets the same flat-card treatment as the
+     Student History card (.mobile-app-card family) without touching those
+     classes directly, since this row's action footer differs per page.
+     ───────────────────────────────────────────────────────────────────────── */
+  .job-list-row {
+    align-items: flex-start !important;
+    padding: 16px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04) !important;
+  }
+  .job-list-logo {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 8px !important;
+  }
+  .job-list-title {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+    word-wrap: break-word !important;
+  }
+  .job-list-meta {
+    gap: 8px !important;
+  }
+  /* Forced onto its own full-width line below the logo+title row via
+     flex-basis, the same technique .app-card-status-actions already uses —
+     .job-list-row keeps flex-wrap (inherited from its desktop rule below)
+     rather than switching to flex-direction:column, so this is the one rule
+     doing the work of separating "header" from "actions" without a JSX
+     wrapper element. */
+  .job-list-actions {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  .job-list-actions .btn {
+    min-height: 40px !important;
+  }
+  .job-list-actions > *:first-child {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     12. Student Profile — header (avatar + name) & action buttons
+     ───────────────────────────────────────────────────────────────────────── */
+  .mobile-profile-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    padding-bottom: 24px !important;
+    border-bottom: 1px solid var(--border) !important;
+    margin-bottom: 24px !important;
+  }
+  .mobile-profile-header img,
+  .mobile-profile-header [class*="avatar"] {
+    width: 96px !important;
+    height: 96px !important;
+    border-radius: 50% !important;
+    margin: 0 auto !important;
+  }
+  /* The avatar's wrapper is position:absolute on desktop (it deliberately
+     overlaps the cover-banner strip above it, top:-40px). Rather than
+     cancel that positioning, pull it up with a negative margin instead —
+     this keeps it in normal flow (so flex centering still applies) while
+     reproducing the same overlap-the-banner effect mobile lost when it was
+     switched to position:static. */
+  .mobile-profile-header .mobile-profile-avatar-wrap {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin-top: -48px !important;
+    display: flex !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+  }
+  /* That same paddingTop existed only to clear space for the absolutely-
+     positioned avatar it used to sit under — no longer needed now that the
+     avatar is a normal flow sibling above it. */
+  .mobile-profile-header .mobile-profile-info {
+    padding-top: 0 !important;
+  }
+
+  /* Cover photo's top corners match .card's own mobile radius (16px) so it
+     doesn't visually poke a sharp corner out of the now-rounded card. */
+  .profile-cover {
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  .mobile-profile-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 12px !important;
+    margin-top: 24px !important;
+  }
+  /* Includes label — the resume file-picker "button" is a styled <label>
+     wrapping a hidden <input type="file">, not a real <button>/<a>. */
+  .mobile-profile-actions button,
+  .mobile-profile-actions a,
+  .mobile-profile-actions label {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     13. Company Portal — Job Posting form & Applicant Pipeline (ATS)
+     ───────────────────────────────────────────────────────────────────────── */
+  .mobile-form-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 12px !important;
+  }
+  .mobile-form-actions button,
+  .mobile-form-actions a,
+  .mobile-form-actions label {
+    width: 100% !important;
+    justify-content: center !important;
+    /* Defensive: same treatment given to .mobile-app-resume-link after an
+       identical "nothing happens on tap" report — punch through any
+       overlapping stacking context regardless of root cause. Capped at 50
+       (not 99999) so it can't outrank a real modal's own z-index:10000. */
+    position: relative !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Applicant card header — the status badge reflows onto its own
+     full-width line above the avatar+name row instead of staying squeezed
+     to the right of an already-tight row (avatar + name + degree chip).
+     order:-1 moves it first; width:100% forces it to fill the entire line
+     on its own, which (with flex-wrap:wrap on the parent) pushes the
+     avatar+name — unchanged, still in their original DOM order — onto a
+     wrapped second line below it. No DOM/JSX reordering needed, so desktop
+     (outside this media query) keeps its current avatar/name/badge row
+     exactly as-is. */
+  .applicant-card-header {
+    flex-wrap: wrap !important;
+  }
+  .applicant-card-header > .badge {
+    order: -1 !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Action footer (Resume link, Invite/Offer/Hire/Reject) — stack
+     full-width instead of a wrapped row of same-sized buttons/links,
+     matching the full-width chunky CTA pattern used everywhere else on
+     mobile. Includes "a" — the Resume/Offer-letter links are anchors,
+     not buttons. */
+  .applicant-card-actions {
+    flex-direction: column !important;
+  }
+  .applicant-card-actions button,
+  .applicant-card-actions a {
+    width: 100% !important;
+  }
+  /* Same "unclickable on mobile" symptom .mobile-app-resume-link was fixed
+     for (Student Applications page) — that fix was never ported here, to
+     the Applicant Pipeline's own resume/offer-letter links. Capped at 50
+     (not 99999) so it can't outrank a real modal's own z-index:10000. */
+  .applicant-card-actions a {
+    position: relative !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Applicant/job card grids — bump the desktop 14px gap up to 16px on
+     mobile specifically (.ats-applicant-grid, the ATS active tab, gets its
+     own gap rule up in section 6 above — this one covers the Manage Jobs
+     grid, the Applicant Pipeline panel, and the ATS closed tab). */
+  .mobile-stack-grid {
+    gap: 16px !important;
+  }
+
+  /* ATS "Filter by Job" / "Filter by Status" — each becomes a full-width,
+     label-above-select stack instead of a row (avoids the select's
+     already-global width:100% mobile rule fighting for space with an
+     inline label in the same row), and the two filter groups stack
+     vertically instead of sitting side by side. */
+  .ats-filter-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+  .ats-filter-row > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+  .ats-filter-select {
+    max-width: 100% !important;
+  }
+}
+
+/* ── Cover photo edit button — floats over the cover photo on both
+   desktop and mobile, so it lives outside the mobile media query. Reuses
+   the same dark-scrim-over-photo look already established by
+   .avatar-overlay in this same file, rather than a theme-color background,
+   since it sits on top of an arbitrary photo rather than app chrome. ──── */
+.cover-camera-btn {
+  background: rgba(0,0,0,0.55);
+  transition: background 0.15s;
+}
+@media (hover: hover) {
+  .cover-camera-btn:hover { background: rgba(0,0,0,0.75); }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   APPLICATION CARD — cross-breakpoint ordering (intentionally NOT gated behind
+   the mobile media query)
+   The status badge needs to be the literal first child of .mobile-app-card in
+   the JSX (so screen readers and the DOM agree it's the headline element), but
+   desktop still needs it rendered beside .mobile-app-header, not above it —
+   its old position, when it was nested inside the header row. This is the only
+   place in this file that sets layout for .mobile-app-card outside the mobile
+   media query: flex-wrap here lets the header+badge share a line while the
+   status/actions section is forced onto its own full-width line via
+   flex-basis:100%, and "order" (set here for desktop, overridden to different
+   values inside the media query above) is what lets the same DOM order render
+   differently at each breakpoint without any JS or duplicated markup.
+   ═════════════════════════════════════════════════════════════════════════════ */
+.mobile-app-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.mobile-app-header {
+  order: 1;
+}
+.mobile-app-card > .badge {
+  order: 2;
+  flex-shrink: 0;
+}
+.app-card-status-actions {
+  order: 3;
+  flex-basis: 100%;
+  width: 100%;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   JOB LISTING ROW — shared "list view" row, used by both Company Manage Jobs
+   and Student Browse Jobs (intentionally NOT gated behind the mobile media
+   query). These rules reproduce Company's original desktop-only inline
+   styling exactly, so switching that page from inline styles to these
+   classes changes nothing on desktop; Student's new list view then inherits
+   the identical desktop look for free. Mobile override lives in the media
+   query above (search "Job Listings").
+   ═════════════════════════════════════════════════════════════════════════════ */
+.job-list-row {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.job-list-logo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.job-list-info {
+  flex: 1;
+  min-width: 0;
+}
+.job-list-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.job-list-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+.job-list-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}

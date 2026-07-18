@@ -1,0 +1,711 @@
+================================================================================
+UCSI INTERNSHIP PORTAL - PROJECT OVERVIEW
+================================================================================
+Final Year Project (FYP) - UCSI University
+
+PROJECT TITLE
+UniJobLink: UCSI University Internship Portal Platform
+
+================================================================================
+PROJECT DESCRIPTION
+================================================================================
+
+UniJobLink is a comprehensive web-based internship job platform designed
+specifically for UCSI University students and partner companies. The platform
+serves as a centralized hub where:
+
+  • Students can discover, apply for, and manage internship opportunities
+  • Companies can post job listings, review applications, and manage their
+    recruitment pipeline
+  • Administrators can oversee the entire ecosystem, verify companies, and
+    monitor placement statistics
+
+The platform streamlines the internship recruitment process for UCSI by
+replacing manual processes with an automated, user-friendly digital solution.
+
+================================================================================
+KEY FEATURES
+================================================================================
+
+STUDENT FEATURES:
+  • Job Discovery & Search
+    - Browse available internship listings filtered by category, location,
+      allowance, and duration
+    - Save favorite jobs for later review
+    - View detailed job information including requirements and company details
+    - One-click application submission
+
+  • Application Management
+    - Track all applications with real-time status updates (PENDING, ACCEPTED,
+      OFFERED, HIRED, REJECTED)
+    - Distinguish between active applications and application history
+    - Receive instant notifications when application status changes
+    - Celebrate achievements with visual feedback when hired
+
+  • Messaging & Communication
+    - Real-time chat with recruiting companies
+    - Per-conversation unread message badges
+    - Sidebar notification badge showing total unread messages
+
+  • Profile Management
+    - Complete student profile with education, skills, and contact information
+    - LinkedIn, GitHub, and portfolio URL integration
+    - Professional resume upload capability
+
+COMPANY FEATURES:
+  • Job Posting Management
+    - Create, edit, and archive job listings
+    - Specify position requirements, allowance, duration, and available slots
+    - Track application count per job in real-time
+    - Switch between grid and list view for job management
+
+  • Applicant Pipeline Management
+    - Comprehensive ATS (Applicant Tracking System) view
+    - Drag-and-drop style pipeline stages (Pending, Interviewing, Offered, Hired)
+    - View applicant profiles and resume snapshots
+    - Filter applications by job
+    - Accept/offer/hire/reject applicants with automated notifications
+
+  • Messaging & Collaboration
+    - Direct communication with student applicants
+    - Real-time chat thread per application
+    - Notification badge for new applicants and messages
+
+  • Dashboard Analytics
+    - Key metrics: new applicants, active job listings, placements
+    - Quick access to recent applications and job postings
+
+ADMIN FEATURES:
+  • Company Verification
+    - Review and approve pending company registrations
+    - Manage company verification status
+    - Badge system showing pending verification count
+
+  • User Management
+    - Reset student and company passwords
+    - Deactivate user accounts
+    - View user management dashboard
+
+  • System Overview
+    - Dashboard with key statistics (total students, verified companies,
+      placements)
+    - Student placement tracker
+    - Access to all administrative tools
+
+================================================================================
+FEATURE-TO-FILE MAPPING
+================================================================================
+
+STUDENT FEATURES IMPLEMENTATION:
+
+Job Discovery & Search
+  Frontend Pages:
+    - frontend/src/pages/student/StudentJobSearch.jsx
+      • Job listing grid with category, location, allowance filters
+      • Save/bookmark job functionality
+      • FeaturedJobsSlider component for homepage highlights
+    - frontend/src/components/JobDetailModal.jsx
+      • Detailed job view with company info, requirements
+      • Info grid (3-column responsive)
+      • Apply button integration
+    - frontend/src/components/FeaturedJobsSlider.jsx
+      • Featured jobs carousel on dashboard
+      • Quick apply from slider
+
+  Backend Controllers:
+    - backend/controllers/studentController.js
+      • GET /student/jobs - Fetch all available jobs (filtered, paginated)
+      • GET /student/jobs/:id - Get specific job details
+      • GET /student/saved-jobs - Retrieve bookmarked jobs
+      • POST /student/save-job/:id - Save job to favorites
+
+  Database Models:
+    - backend/models/JobPosting.js
+      • Fields: title, description, category, location, allowance, duration
+      • Associations: Company, Applications
+    - backend/models/Student.js
+      • Relationship: savedJobs (many-to-many via joining table)
+
+Application Management
+  Frontend Pages:
+    - frontend/src/pages/student/StudentApplications.jsx
+      • Tab view: Active vs History applications
+      • Application card component with status badge
+      • Filter by status (ACCEPTED, OFFERED, REJECTED, etc.)
+
+  Backend Controllers:
+    - backend/controllers/studentController.js
+      • POST /student/apply/:jobId - Submit job application
+      • GET /student/applications - Fetch all student applications
+      • PUT /student/applications/:id - Withdraw application
+
+  Database Models:
+    - backend/models/Application.js
+      • Fields: status (PENDING/ACCEPTED/OFFERED/HIRED/REJECTED)
+      • Fields: companySeenAt, studentSeenAt (notification tracking)
+      • Associations: Student, JobPosting, Company
+
+Messaging & Communication
+  Frontend Pages:
+    - frontend/src/pages/student/StudentMessages.jsx
+      • List of conversations with unread badges
+      • Chat view with message history
+      • Back button for mobile (md:hidden)
+      • Real-time message updates via Socket.io
+
+  Backend Controllers:
+    - backend/controllers/studentController.js
+      • GET /student/chats - Fetch all conversations with unreadCount
+      • POST /student/chats/:roomId/messages - Send message
+      • GET /student/unread-count - Total unread messages for sidebar badge
+
+  Database Models:
+    - backend/models/ChatRoom.js
+      • Fields: studentId, companyId, lastMessage, updatedAt
+    - backend/models/Message.js
+      • Fields: content, senderId, readAt, createdAt
+      • Associations: ChatRoom, User
+
+Profile Management
+  Frontend Pages:
+    - frontend/src/pages/student/StudentProfile.jsx
+      • Edit mode: Education, skills, contact info, social links
+      • View mode: Read-only profile display
+      • Skill tag management (add/remove skills)
+
+  Backend Controllers:
+    - backend/controllers/studentController.js
+      • GET /student/profile - Fetch full student profile
+      • PUT /student/profile - Update profile data
+      • POST /student/profile/avatar - Upload profile picture
+      • POST /student/profile/resume - Upload resume file
+
+  Database Models:
+    - backend/models/Student.js
+      • Fields: firstName, lastName, faculty, degreeProgram, phone
+      • Fields: skills (JSON), linkedinUrl, githubUrl, portfolioUrl
+      • Fields: profileImageUrl, resumeUrl
+
+================================================================================
+
+COMPANY FEATURES IMPLEMENTATION:
+
+Job Posting Management
+  Frontend Pages:
+    - frontend/src/pages/company/CompanyManageJobs.jsx
+      • Active jobs grid/list view with toggle
+      • Archived jobs section
+      • JobForm component (2-column responsive form for create/edit)
+      • Create new job inline form at top
+
+  Backend Controllers:
+    - backend/controllers/companyController.js
+      • GET /company/jobs - Fetch company's job listings
+      • POST /company/jobs - Create new job posting
+      • PUT /company/jobs/:id - Update job details
+      • DELETE /company/jobs/:id - Archive job listing
+
+  Database Models:
+    - backend/models/JobPosting.js
+      • Fields: title, description, category, location, requirements
+      • Fields: allowance, duration, positionsLeft, archivedAt
+      • Associations: Company, Applications, Messages
+
+Applicant Pipeline Management
+  Frontend Components:
+    - frontend/src/components/ApplicantPipelinePanel.jsx
+      • Full-screen popout panel for applicant pipeline
+      • Grid of applicant cards (300px responsive min-width)
+      • Status badges (Pending, Interviewing, Offered, Hired)
+      • Filter by job posting
+    - frontend/src/components/ApplicantPipelineParts.jsx
+      • Individual applicant card component
+      • Status transition buttons
+      • View applicant profile modal link
+    - frontend/src/components/StudentProfileModal.jsx
+      • Student details and resume snapshot view
+      • Downloadable resume link
+
+  Frontend Pages:
+    - frontend/src/pages/company/CompanyATS.jsx
+      • Main ATS dashboard with applicant filtering
+      • Pipeline card display (responsive grid)
+      • Job filter selector
+      • Status statistics badge display
+
+  Backend Controllers:
+    - backend/controllers/companyController.js
+      • GET /company/applications - Fetch all applicants for company
+      • PUT /company/applications/:id - Update application status
+      • GET /company/applications/:id - Get specific application details
+
+  Database Models:
+    - backend/models/Application.js
+      • Status workflow field with validation
+      • Timestamps for status changes
+      • Resume snapshot storage
+
+Messaging & Collaboration
+  Frontend Pages:
+    - frontend/src/pages/company/CompanyMessages.jsx
+      • Similar to StudentMessages but company-side
+      • Per-room unread badges
+      • Real-time message sync
+
+  Backend Controllers:
+    - backend/controllers/companyController.js
+      • GET /company/chats - Fetch company conversations
+      • POST /company/chats/:roomId/messages - Send message
+
+  Database Models:
+    - backend/models/ChatRoom.js
+      • Stores student-company conversation pairs
+    - backend/models/Message.js
+      • Per-message sender tracking
+
+Dashboard Analytics
+  Frontend Pages:
+    - frontend/src/pages/company/CompanyDashboard.jsx
+      • 3-column stat grid (responsive auto-fit)
+      • Quick action cards (job posting, view applicants)
+      • Recent applications list
+
+  Backend Controllers:
+    - backend/controllers/companyController.js
+      • GET /company/dashboard - Fetch dashboard stats
+      • Returns: newApplicantCount, activeJobs, recentApplications
+
+Company Profile
+  Frontend Pages:
+    - frontend/src/pages/company/CompanyProfile.jsx
+      • Edit/view company details
+      • Logo, description, industry, company size, location
+
+  Backend Controllers:
+    - backend/controllers/companyController.js
+      • GET /company/profile - Fetch company info
+      • PUT /company/profile - Update company details
+
+  Database Models:
+    - backend/models/Company.js
+      • Fields: companyName, industry, description, companySize, etc.
+      • Fields: profileImageUrl (logo), addressLine, foundedYear
+
+================================================================================
+
+ADMIN FEATURES IMPLEMENTATION:
+
+Company Verification
+  Frontend Pages:
+    - frontend/src/pages/admin/AdminApprovals.jsx
+      • List of pending companies awaiting verification
+      • Company detail card with approve/reject actions
+      • Badge showing count of pending verifications
+
+  Backend Controllers:
+    - backend/controllers/adminController.js
+      • GET /admin/pending-companies - Fetch unverified companies
+      • POST /admin/approve-company/:id - Verify company
+      • POST /admin/reject-company/:id - Reject company
+
+  Database Models:
+    - backend/models/Company.js
+      • Field: isVerified (boolean, default false)
+      • Field: verifiedAt (timestamp)
+
+User Management
+  Frontend Pages:
+    - frontend/src/pages/admin/AdminUserManagement.jsx
+      • Table of all students and companies (if applicable)
+      • Search/filter by name or email
+      • Reset password action
+      • Deactivate account option
+
+  Backend Controllers:
+    - backend/controllers/adminController.js
+      • GET /admin/users - Fetch all users
+      • POST /admin/users/:id/reset-password - Generate password reset
+      • PUT /admin/users/:id - Update user status (active/inactive)
+
+  Database Models:
+    - backend/models/User.js
+      • Field: isActive (boolean)
+      • Field: lastLogin (timestamp)
+
+System Overview
+  Frontend Pages:
+    - frontend/src/pages/admin/AdminDashboard.jsx
+      • 4-column stat grid (responsive auto-fit): total students, companies,
+        placements, pending verifications
+      • Admin action cards (approvals, placement tracker, user management)
+    - frontend/src/pages/admin/AdminStudentTracker.jsx
+      • 2-column stat grid: students placed, pending applications
+      • Detailed student placement list
+      • Filter by placement status
+
+  Backend Controllers:
+    - backend/controllers/adminController.js
+      • GET /admin/dashboard - Fetch dashboard statistics
+      • GET /admin/student-placements - Fetch placement tracking data
+
+================================================================================
+
+NOTIFICATION SYSTEM IMPLEMENTATION:
+
+Unread Message Badges (Per-Conversation)
+  Frontend Components:
+    - StudentMessages.jsx & CompanyMessages.jsx
+      • Display unreadCount from API response
+      • Badge on each conversation list item
+
+  Backend Implementation:
+    - backend/controllers/studentController.js getMyChats()
+      • Aggregates unread messages per chat room
+      • Counts messages where readAt is null and senderId != currentUser
+    - backend/controllers/companyController.js getMyChats()
+      • Same logic, prevents showing own sent messages as unread
+
+  Database:
+    - Message.readAt field
+    - Message.senderId field
+    - ChatRoom relationship to Message collection
+
+Application Status Update Badges (Sidebar)
+  Frontend Components:
+    - StudentLayout.jsx
+      • Displays updateCount badge on Applications link
+    - CompanyLayout.jsx
+      • Displays newApplicantCount badge on Applicants link
+
+  Backend Implementation:
+    - backend/controllers/studentController.js
+      • GET /student/notifications/count
+      • Counts applications where studentSeenAt is null AND
+        status is not 'PENDING'
+    - backend/controllers/companyController.js
+      • GET /company/notifications/count
+      • Counts applications where companySeenAt is null
+
+  Database:
+    - Application.studentSeenAt (DATE, nullable)
+    - Application.companySeenAt (DATE, nullable)
+    - Application.status field
+
+Hired Celebration Popup
+  Frontend Components:
+    - frontend/src/components/HiredCelebration.jsx
+      • Full-screen overlay with confetti animation
+      • Trophy icon with bounce animation
+      • Company logo and job title display
+      • Fireworks burst effects
+
+  Frontend Integration:
+    - frontend/src/pages/student/StudentDashboard.jsx
+      • Checks for hired celebration on mount
+      • Displays HiredCelebration component if found
+      • Calls onClose to dismiss and mark as seen
+
+  Backend Implementation:
+    - backend/controllers/studentController.js
+      • GET /student/notifications/hired-celebration
+      • Returns most recent HIRED app where studentSeenAt is null
+      • Includes Company data (name, logo) and JobPosting (title)
+      • POST /student/notifications/mark-seen
+      • Sets studentSeenAt for specific application
+
+  Database:
+    - Application.status = 'HIRED'
+    - Application.studentSeenAt tracking
+    - Company.profileImageUrl (logo)
+
+================================================================================
+
+LAYOUT & RESPONSIVE DESIGN IMPLEMENTATION:
+
+Shared Layout Components
+  Frontend Components:
+    - frontend/src/components/layouts/StudentLayout.jsx
+      • Sidebar (transforms on mobile to drawer)
+      • Main content area with padding (px-4 py-5 md:px-8 md:py-7)
+      • Footer
+      • Hamburger button (md:hidden class)
+      • Backdrop with blur effect (4px)
+    - frontend/src/components/layouts/CompanyLayout.jsx
+      • Identical responsive structure to StudentLayout
+    - frontend/src/components/layouts/AdminLayout.jsx
+      • Identical responsive structure
+
+  Breakpoint Details:
+    - Mobile: < 768px (max-md: prefix)
+      • Full-width layout
+      • Hamburger menu active
+      • Single-column grids
+      • Reduced padding (px-4)
+    - Desktop: >= 768px (md: prefix)
+      • Sidebar visible
+      • Multi-column layouts
+      • Increased padding (px-8)
+      • Full-width content
+
+Mobile-Specific Adjustments
+  Frontend Pages with Mobile Restructuring:
+    - StudentMessages.jsx / CompanyMessages.jsx
+      • List: w-full md:w-[230px] (full width on mobile, fixed on desktop)
+      • Chat: hidden on mobile until selection, full-width after
+      • Back button: md:hidden (only shows on mobile)
+      • Height: h-[calc(100dvh-190px)] md:h-[calc(100vh-230px)]
+
+  Responsive Grid Fixes:
+    - All job listing grids: minmax(min(290px, 100%), 1fr)
+    - Stat card grids: minmax(min(140px-150px, 100%), 1fr)
+    - Form field grids: minmax(min(200px, 100%), 1fr)
+    - Modal padding: 24px desktop, 10px mobile (< 640px)
+
+  Frontend Files Modified:
+    - frontend/src/pages/student/StudentJobSearch.jsx
+    - frontend/src/pages/student/StudentDashboard.jsx
+    - frontend/src/pages/student/StudentApplications.jsx
+    - frontend/src/pages/company/CompanyManageJobs.jsx
+    - frontend/src/pages/company/CompanyDashboard.jsx
+    - frontend/src/pages/company/CompanyATS.jsx
+    - frontend/src/pages/admin/AdminDashboard.jsx
+    - frontend/src/pages/admin/AdminStudentTracker.jsx
+    - frontend/src/index.css (media queries for modal padding)
+
+================================================================================
+
+AUTHENTICATION & AUTHORIZATION:
+
+Login & Registration
+  Frontend Pages:
+    - frontend/src/pages/LoginPage.jsx
+      • Split layout: brand panel (desktop only) + form panel
+      • Email/password input fields
+      • Role-based redirect after login
+    - frontend/src/pages/StudentRegisterPage.jsx
+      • Multi-field form: name, UCSI ID, email, password
+      • 2-column responsive grid for paired fields
+      • Email validation (must be @ucsiuniversity.edu.my)
+    - frontend/src/pages/CompanyRegisterPage.jsx
+      • Company-specific fields: name, industry, contact info
+      • Similar 2-column responsive grid
+    - frontend/src/pages/ForgotPasswordPage.jsx
+    - frontend/src/pages/ResetPasswordPage.jsx
+
+  Backend Controllers:
+    - backend/controllers/authController.js
+      • POST /auth/register - Create new user + role-specific record
+      • POST /auth/login - Authenticate and return JWT token
+      • POST /auth/logout - Invalidate token
+      • POST /auth/forgot-password - Send reset email
+      • POST /auth/reset-password - Update password
+
+  Frontend Context:
+    - frontend/src/context/AuthContext.jsx
+      • useAuth() hook for accessing login/logout/user state
+      • Automatically redirects to login if not authenticated
+      • Stores JWT in localStorage
+
+  Frontend Route Protection:
+    - frontend/src/components/ProtectedRoute.jsx
+      • Checks user role and redirects to appropriate dashboard
+      • Prevents unauthorized access to role-specific routes
+
+================================================================================
+
+REAL-TIME FEATURES (Socket.io):
+
+Backend Setup
+  - backend/socket/socketHandler.js
+    • Establishes Socket.io connections
+    • Namespaces: /student, /company (role-based)
+    • Event handlers:
+      - joinRoom: Add user to chat room
+      - leaveRoom: Remove user from chat room
+      - sendMessage: Broadcast message to room members
+      - messageRead: Update message readAt timestamp
+      - typing: Emit typing indicator (foundation for future)
+
+  - backend/models/index.js
+    • Socket.io instance exported for use across controllers
+
+Frontend Setup
+  - frontend/src/api/socket.js
+    • Socket.io client initialization
+    • Auto-connects on login
+    • Auto-disconnects on logout
+
+  Frontend Hooks/Context:
+    - Message updates via socket event listeners
+    - Real-time message rendering in StudentMessages/CompanyMessages
+    - Typing indicator display (UI ready)
+
+================================================================================
+
+TECHNICAL ARCHITECTURE
+================================================================================
+
+FRONTEND (React 19 + Vite)
+  • Framework: React 19 with hooks for state management
+  • Build Tool: Vite (ultra-fast ES module bundler)
+  • Styling: Tailwind CSS (utility-first CSS framework)
+  • Real-time: Socket.io client for messaging
+  • Icons: Lucide React icon library
+  • UI Components: Custom card, button, badge, modal, and form components
+  • Responsive Design: Mobile-first approach with 768px breakpoint
+
+BACKEND (Node.js + Express + Sequelize)
+  • Runtime: Node.js with Express.js server framework
+  • Database ORM: Sequelize (SQL query builder)
+  • Authentication: JWT (JSON Web Tokens) with role-based access control
+  • Real-time: Socket.io for instant messaging
+  • File Upload: Multer middleware for resume and profile image uploads
+
+DATABASE (MySQL)
+  • Relational database with normalized schema
+  • Core tables: Users, Students, Companies, JobPostings, Applications,
+    Messages, ChatRooms
+  • Tracking fields: Timestamps, seen/unseen status, application status
+  • Indexing: Optimized queries for application filtering and search
+
+DEPLOYMENT
+  • Frontend: Vite dev server (localhost:5173)
+  • Backend: Express server (localhost:5000)
+  • Database: MySQL local/cloud instance
+
+================================================================================
+RECENT IMPLEMENTATIONS
+================================================================================
+
+1. MOBILE RESPONSIVENESS MAPPING
+   - Converted all pages from desktop-only to mobile-responsive design
+   - Implemented automatic layout switching at 768px breakpoint
+   - Hamburger menu with animated sidebar drawer on mobile
+   - Backdrop blur effect (4px) for mobile overlay interactions
+   - Messages page restructured as full-width list/chat exclusive views
+   - Grid layouts use dynamic min() guards to prevent overflow on 320px phones
+   - All page headers adapted with flexWrap fallback for long content
+
+2. NOTIFICATION SYSTEM
+   - Per-conversation unread message badges
+   - Company notification badge for new applicants
+   - Student notification badge for status updates (excludes PENDING)
+   - Hired celebration: Confetti animation + fireworks when student is hired
+   - Marks-seen tracking via companySeenAt and studentSeenAt timestamps
+   - Sidebar total unread count aggregation
+
+3. REAL-TIME MESSAGING
+   - Socket.io integration for instant messaging
+   - Per-room unread message computation
+   - One-to-one chat between students and companies
+   - Typing indicators (foundation for future enhancement)
+
+4. APPLICATION PIPELINE
+   - Full applicant management for companies
+   - Status workflow: PENDING → ACCEPTED/REJECTED → OFFERED → HIRED
+   - Auto-decrement positions available when applicant hired
+   - Applicant pipeline panel with filtering and search
+   - Resume snapshot storage for offline review
+
+================================================================================
+DATABASE SCHEMA HIGHLIGHTS
+================================================================================
+
+Users Table: Base user model (email, password, role: STUDENT/COMPANY/ADMIN)
+Students Table: Student-specific data (firstName, lastName, faculty, skills, etc.)
+Companies Table: Company information (companyName, industry, description, etc.)
+JobPostings Table: Job listings with requirements and metadata
+Applications Table: Student-to-job applications with status tracking
+Messages Table: Individual messages with read/sender tracking
+ChatRooms Table: Conversation groups between student and company
+
+Key Fields for Notifications:
+  - Application.companySeenAt / studentSeenAt: Tracks when unseen updates clear
+  - Message.readAt: Tracks per-message read status
+  - ChatRoom.lastMessage: Retrieves latest message for list display
+
+================================================================================
+USER ROLES & ACCESS CONTROL
+================================================================================
+
+STUDENT ROLE:
+  - Access: /student/* routes
+  - Capabilities: Apply for jobs, manage applications, message companies,
+    edit profile
+  - Restrictions: Cannot post jobs, cannot approve applications
+
+COMPANY ROLE:
+  - Access: /company/* routes
+  - Capabilities: Post/edit/archive jobs, manage applications, message students,
+    view analytics
+  - Restrictions: Cannot apply for jobs, limited to own job postings
+
+ADMIN ROLE:
+  - Access: /admin/* routes
+  - Capabilities: Verify companies, manage users, view system-wide analytics
+  - Restrictions: Read-only for most data (except user password reset)
+
+GUEST (Unauthenticated):
+  - Access: /login and /register routes only
+  - Can create new student or company account
+
+================================================================================
+TESTING & VALIDATION
+================================================================================
+
+Automated test scripts verify:
+  • Per-conversation unread badge accuracy
+  • Hired celebration flow end-to-end
+  • Notification counting and dismissal
+  • Application status change handling
+  • Message delivery and receipt
+
+Test data seeded with:
+  • 5+ companies with full profiles and job listings
+  • 10+ students with diverse skills and applications
+  • Sample chat messages and application states across all statuses
+
+================================================================================
+PERFORMANCE OPTIMIZATIONS
+================================================================================
+
+  • Grid layouts: CSS min() guards prevent horizontal overflow on narrow phones
+  • Modal padding: Reduced from 24px to 10px on mobile (< 640px) screens
+  • Message list: Virtual scrolling foundation for chat list (ready for
+    implementation)
+  • Database: Indexed queries for applications, messages, and chat rooms
+  • Frontend: Tailwind purging removes unused CSS, asset minification
+  • Real-time: Socket.io namespaces separate student/company communication
+
+================================================================================
+FUTURE ENHANCEMENTS
+================================================================================
+
+Potential expansions for future iterations:
+
+  • Typing indicators in real-time chat
+  • Resume parsing for auto-matching student skills to job requirements
+  • Video interview scheduling and recording integration
+  • Email notifications for application status changes
+  • Company review and rating system by students
+  • Analytics dashboard for company recruitment metrics
+  • Bulk actions for application management
+  • Interview scheduling calendar integration
+  • Offer letter generation and e-signature workflow
+
+================================================================================
+SUMMARY
+================================================================================
+
+UniJobLink is a fully functional, production-ready internship management
+platform that bridges the gap between UCSI University students and recruiting
+companies. With a modern tech stack (React + Node.js + MySQL), responsive
+design supporting mobile and desktop users, and robust features for real-time
+communication and application tracking, the platform successfully automates
+and streamlines the university's internship recruitment process.
+
+The recent implementations focus on mobile accessibility and user engagement
+through notifications and real-time messaging, making the platform accessible
+to students and companies regardless of device or location.
+
+================================================================================

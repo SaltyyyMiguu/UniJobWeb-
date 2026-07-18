@@ -1,0 +1,531 @@
+================================================================================
+ UNIJOBLINK (UCSI INTERNSHIP PORTAL) — PROJECT DOCUMENTATION & CHANGE LOG
+================================================================================
+
+Project:      UniJobLink — UCSI University's official internship management and
+              placement platform.
+Users:        Students, Companies (HR partners), Academic Supervisors, Admins.
+Tech stack:   Frontend — React 19 (Vite), plain CSS (index.css) + inline styles,
+                         no Tailwind component classes (Tailwind is only used for
+                         a handful of layout visibility toggles).
+              Backend  — Node.js / Express, Sequelize ORM, MySQL, Socket.IO
+                         (real-time chat/notifications).
+Design system: Desktop uses a deliberately sharp, 0px-radius "editorial minimal"
+              style. Mobile (<=768px) uses a warmer, rounded, app-like style.
+              Golden rule followed throughout this project: desktop layout must
+              never change unless explicitly requested — all mobile-specific
+              layout changes live inside "@media (max-width: 768px)" in
+              frontend/src/index.css.
+
+Purpose of this document: a running record of what was built, what was broken,
+what was changed, and why — organised into phases in the order the work actually
+happened, for project documentation / FYP write-up purposes.
+
+--------------------------------------------------------------------------------
+ PHASE 1 — FOUNDATIONAL BUILD & MOBILE UI/UX OVERHAUL  (34 rounds, detailed)
+--------------------------------------------------------------------------------
+Scope note: this phase covers a long earlier working session, recovered from its
+raw transcript (34 distinct formal "UCSI Internship Portal - [Feature]" directive
+rounds, in order). The transcript itself begins mid-project — an even earlier
+"Phase 7 Archival UI & Audit Trail Refactor" round predates it and left no
+recoverable detail — and contains two of its own mid-session compactions, so a
+few early rounds are reconstructed from summarized context rather than the
+original raw request text. Between round 1 and round 2 there is also a large
+stretch of informal, non-formal-directive work not listed below: regenerating
+mock seed data, tag-based job-search sorting UX, a "Saved Jobs" popout panel, a
+full read/unread notification system (student + company side), and an unrelated
+side-tangent (setting up a Rust/Tauri desktop mascot app, "Aemeath" — not part of
+UniJobLink itself).
+
+  1. QA Fixes (Modal Footer & Legacy Data) — Fixed JobDetailModal.jsx still
+     showing an "Apply Now" button to companies viewing their own archived jobs
+     (role-gated the footer); added backend/cleanup-legacy-jobs.js, a one-time
+     script to force any job that hit 0 positionsLeft before auto-archive
+     existed into the Archived state; hardened getCompanyJobs in
+     companyController.js to enforce the same rule going forward. Also produced
+     fresh seed data (seed-fresh.js — 6 companies, 8 students, 25 jobs, 15+
+     applications spanning every lifecycle status).
+
+  2. Phase 8 (Mobile Responsiveness Refactor) — The first full mobile pass:
+     @media (max-width: 768px) rules added across the auth split-screen layout,
+     sidebar-to-bottom-nav/hamburger conversion, job/data grids collapsed to a
+     single column, modals capped to ~90% width, ATS pipeline given horizontal
+     scroll. Pure CSS, explicitly no backend/state changes. Also fixed a
+     Messages-tab chat pane that was invisible on mobile due to an inverted
+     max-md:hidden rule.
+
+  3. Master Mobile UX Refactor (Strict UI Only) — Pushed toward a more
+     native-app feel: hardened the viewport meta tag in index.html, added a
+     real thumb-zone bottom navigation bar (<nav className="bottom-nav">) to
+     StudentLayout.jsx/CompanyLayout.jsx/AdminLayout.jsx reusing each layout's
+     existing nav-item arrays and unread-badge state, converted modals to
+     full-screen mobile takeovers, and collapsed remaining grids to 1-column.
+
+  4. Mobile Layout Bug Fix (The Ghost Sidebar) — A blank gap plus content
+     pushed off-screen on mobile. Root cause: an inline style={{marginLeft:
+     '220px'}} on the content wrapper was beating Tailwind's max-md:ml-0 on
+     CSS specificity, not a Tailwind build issue as first suspected — fixed
+     with a targeted !important override in index.css.
+
+  5. Phase 8.4 (Final Mobile Polish, Sizing & Global Nav) — Deprecated the
+     hamburger menu entirely (both breakpoints) now that a bottom nav existed;
+     removed the associated open/setOpen drawer state and blur backdrop from
+     all three layouts; moved Sign Out into its own card at the bottom of each
+     Profile page; scaled down mobile paddings/typography; re-fixed the Ghost
+     Sidebar offset; added bottom-nav clearance padding; killed sticky
+     :hover-triggered states on touch via @media (hover: hover).
+
+  6. Phase 10 (Lecturer/Supervisor Portal, Handshake & Admin Master UI) — A
+     large feature round: introduced a new SUPERVISOR role; a student <->
+     supervisor "handshake" flow (request/accept/reject); a post-hire
+     placement-approval status (APPROVED_BY_UNI); and an Admin dashboard split
+     into Students/Companies/Supervisors tabs with a "god mode"
+     AdminEditUserModal able to force-approve a supervisor assignment.
+     Touched User/Student/Supervisor/Application models, new
+     supervisorController.js/supervisorRoutes.js, new SupervisorLayout.jsx,
+     SupervisorDashboard.jsx, SupervisorStudentDetail.jsx, SupervisorProfile.jsx,
+     SupervisorRegisterPage.jsx, plus updates to auth/admin controllers, App.jsx,
+     LoginPage.jsx and the seed script. Also debugged a broken admin login,
+     traced to the admin account never actually having been seeded.
+
+  7. Phase 10.1 (Admin Layout Refactor, Search & Faculty Filters) — Added a
+     faculty ENUM field to User (kept distinct from Student's own free-text
+     faculty field); decluttered the Admin sidebar; split the Master Data
+     tables out of AdminDashboard.jsx into a new AdminUserManagement.jsx;
+     added live search + faculty-filter to both the Supervisor and Admin
+     student tables.
+
+  8. Phase 9 (Automated Email Notifications - Full Ecosystem) — Nodemailer-based
+     email notifications at every state-machine transition (interview, offer,
+     rejection, offer accepted/declined, placement review needed), built
+     strictly non-blocking (fire-and-forget, never delays the API response).
+     New backend/utils/mailer.js with per-role send functions and HTML
+     templates; SMTP config added to .env. While implementing this, also
+     noticed and filled a real functional gap not in the original ask:
+     students had no way to actually accept/decline an offer, so
+     respondToOffer was extended to support HIRED/REJECTED responses with new
+     Accept/Decline buttons on the student side.
+
+  9. Security & QA Hotfixes — Patched five audit findings: (1) account-takeover
+     risk from the password-reset token being echoed back in the API response
+     body, (2) a TOCTOU race condition on the HIRED transition, (3) a stale
+     session still working after a user was deactivated, (4) stored XSS via a
+     spoofed resume-upload file extension, (5) overly detailed error responses
+     leaking internal info. Fixes: stopped returning resetToken from
+     authController.js (emails it instead); added a row-level DB lock
+     (LOCK.UPDATE) with a re-check on the HIRED branch in both
+     companyController.js and studentController.js; middleware/auth.js now
+     rejects tokens belonging to archived users; Multer upload config hardened
+     to check both MIME type and extension. Verified live by firing 3
+     concurrent "Accept Offer" requests and confirming exactly one succeeded.
+
+  10. Frontend Stability & UX Hardening — Four stability patches: a global
+      React Error Boundary (new ErrorBoundary.jsx wrapping <App/>); a
+      loadError-state-plus-Retry-button pattern added to three profile pages
+      that could get stuck in an infinite loading spinner; CSS truncation for
+      overflowing table cells in AdminUserManagement.jsx; a visible warning
+      when AdminEditUserModal.jsx's secondary supervisor-list fetch fails
+      silently. (This is the round matching "Global Error Boundary / infinite
+      spinners / admin table overflow / secondary fetch failures.")
+
+  11. Mobile Web UI/UX Audit — A research-only pass (no code change requested)
+      that inspected modal viewport-trapping, touch-target sizing, bottom-nav
+      clearance and table-overflow risk on real phone widths. Found and fixed
+      modals with no height cap by adding a new .compact-modal-panel class
+      (caps height at min(90vh,90dvh) with internal scroll), applied to five
+      raw fixed-position modals; added iOS safe-area footer padding; added a
+      global minimum touch-target width rule.
+
+  12. Master Mobile UX Redesign (Wireframe Driven) — First wireframe-image-based
+      directive: converted HTML data tables to a "Table-to-Card" mobile
+      pattern (hide <thead>, make rows display:block, add data-label attributes
+      read by a td::before pseudo-header) without touching desktop's real
+      <table> markup. Applied to every tab of AdminUserManagement.jsx and
+      SupervisorDashboard.jsx, and proactively to AdminStudentTracker.jsx too
+      (shared the same table class and would otherwise have silently broken).
+
+  13. FULL Global Mobile Redo (Login to End) — Extended the wireframe look
+      globally: .card/.input/.btn given blanket mobile overrides (16px radius,
+      48px min-height, 16px font size to stop iOS auto-zoom-on-focus) across
+      every Login/Register/Profile form — 14 separate stacked-form-row fixes
+      across all three Register pages plus several Profile/modal files. Caught
+      and fixed a side effect where the new blanket .card padding broke sticky
+      gradient header banners in several modals.
+
+  14. Wireframe UI Redesign (Page 1: Auth Flow) — Pivoted away from "one giant
+      global CSS override" toward page-scoped classes (auth-mobile-card,
+      auth-mobile-input, auth-mobile-btn) applied directly in JSX for a
+      guaranteed cascade win. Applied across LoginPage.jsx and all three
+      Register pages.
+
+  15. Wireframe UI Redesign (Page 2: Student Job Search & Modal) — Wireframe
+      tokens applied to StudentJobSearch.jsx's filter bar and job cards, and
+      to JobDetailModal.jsx's call-to-action footer; fixed a width:100% vs.
+      justify-content:space-between collision in that footer row.
+
+  16. Final Mobile Polish, Sizing & Global Nav (2nd pass) — A follow-up/partial
+      re-issue of round 5's brief: removed the Location filter entirely from
+      StudentJobSearch.jsx, fixed JobDetailModal.jsx's footer to inherit
+      theme variables instead of hardcoded colors (was breaking in dark mode),
+      added defensive margin-reset CSS.
+
+  17. Student Search & Job Card Mobile Polish — Removed leftover "ghost"
+      wrapper elements around the search bar; root-caused a "massive gap" bug
+      to a stale flex:'1 1 200px' width-basis being reinterpreted as a
+      min-height once the filter row became flex-direction:column; replaced
+      several hardcoded hex colors with theme CSS variables (they were
+      breaking dark mode); hid the desktop-only "hover a card to preview" hint
+      text on mobile.
+
+  18. Brute-Force Hover Kill & Compact Mobile Layout — @media (hover: hover)
+      alone wasn't reliably suppressing "sticky" hover states on some touch
+      devices, so an explicit window.innerWidth > 768 JS check was added
+      alongside it (not instead of it, to avoid regressing touch-tablets in
+      landscape); search-card and job-card padding/gaps tightened further.
+
+  19. Wireframe UI Redesign (Page 3: Student Applications) — First pass of new
+      .mobile-app-card / .mobile-app-header / .mobile-app-actions /
+      .mobile-app-resume-link classes for StudentApplications.jsx — this round
+      kicked off a long iterative chain (rounds 19-26) to get this one page's
+      mobile card layout right. Deliberately preserved the existing
+      color-coded borderLeft status accent by scoping the "remove border"
+      instruction to only the top/right/bottom sides.
+
+  20. Student Applications Mobile UX Polish — Fixed a disconnected logo/title
+      header and squished meta-info wrapping in the History tab, plus an
+      unclickable Resume link — root-caused to a z-index/pointer-events
+      stacking issue and fixed with position:relative + raised z-index (the
+      first appearance of what became this project's standard fix pattern for
+      that class of bug).
+
+  21. Application Card Layout & Click Fix — Round 20's forced row layout broke
+      the History tab, so it was abandoned in favor of natural content
+      stacking with the status badge pinned via position:absolute to a
+      top-right safe zone.
+
+  22. My Applications Mobile Layout Fix — The absolute-positioned badge from
+      round 21 started overlapping long job titles once titles got long
+      enough to wrap; replaced with flex-wrap on the header/badge wrapper so
+      badges reflow onto their own line instead of overlapping.
+
+  23. My Applications Final Layout Polish (1st pass) — Fixed a "massive
+      horizontal gap" between logo and text; introduced a 56px top-padding
+      "safe zone" on the card reserved for the absolutely-positioned badge, to
+      avoid round 21's title-overlap problem recurring.
+
+  24. My Applications Mobile "Clean Slate" Fix — The safe-zone/absolute
+      approach was still fragile: a broad [style*="justify-content"] CSS
+      selector had accidentally applied position:absolute to the Resume/Action
+      buttons too, crushing the text column. This round abandoned absolute
+      positioning entirely in favor of a natural-flow layout, and found the
+      real underlying structural bug: the Resume/Offer-letter links lived as a
+      third child inside .mobile-app-header alongside the logo and text,
+      competing for space — fixed with a genuine JSX restructure in
+      StudentApplications.jsx moving the action links out of the header.
+
+  25. My Applications Final Layout Polish (2nd pass) — CONFIRMED DUPLICATE.
+      A verbatim repeat of round 23's directive. Recognized as identical to a
+      message sent two rounds earlier; since rounds 23-24 had already
+      root-caused and fixed the real problem via the JSX restructure,
+      re-applying it blindly would have undone that progress — so no changes
+      were made, and the existing (already-fixed) state was verified instead.
+
+  26. Application Card Final Visual Polish — Two closing visual requests now
+      that the JSX fix held: moved the status badge to be the literal first
+      child of the card (above the header) and enlarged it; unified the
+      Active tab's layout to match the now-fixed History tab structure. This
+      round's tail also produced an unrelated deliverable — a
+      deployment-roadmap.txt tech-stack/hosting/CI plan, research only, no
+      code changes.
+
+  27. Wireframe UI Redesign (Page 4: Profile Pages) — Wireframe styling
+      applied to StudentProfile.jsx's avatar+name header and its action
+      buttons. Caught a mismatch between the directive's assumption (avatar
+      and name "side-by-side") and reality (the avatar is actually
+      position:absolute, overlapping a cover banner) and adjusted the fix to
+      match the real structure rather than the literal spec.
+
+  28. Profile Banner, Spacing & Button Refactor — Added a real cover-photo
+      image (replacing a plain gradient); restored the avatar's cover-overlap
+      effect via position:relative + a negative margin-top; shrank and
+      repositioned an oversized "Edit Profile" button; mirrored applicable
+      parts to CompanyProfile.jsx. SupervisorProfile.jsx was explicitly
+      checked and skipped — it has no cover-banner/absolute-avatar pattern, so
+      the directive didn't apply there.
+
+  29. Interactive Cover Photo Upload — Made the cover photo clickable: a
+      camera-icon button opens a file picker and instantly previews the
+      chosen image via URL.createObjectURL, added to both StudentProfile.jsx
+      and CompanyProfile.jsx. Explicitly flagged as preview-only — no backend
+      endpoint exists yet, so the image resets on page refresh.
+
+  30. Company Portal Mobile Reskin (1st pass) — Brought the Company Portal
+      (Job Posting form + ATS pipeline) up to the same mobile design tokens
+      already used on the Student side: chunky inputs across all 9 JobForm
+      fields, stacked grids, full-width action buttons, restyled ATS card
+      headers/footers. Flagged that part of the directive's premise (raw
+      <table> markup in the ATS) didn't match reality — it was already
+      card-based from an earlier phase, so that part of the instruction was
+      largely a no-op.
+
+  31. Company Portal Mobile Reskin (2nd pass) — CONFIRMED DUPLICATE. A
+      verbatim repeat of round 30. Re-verified all three previously-touched
+      files still had the changes intact and made no further edits. (This is
+      the "sent twice" round already known from the condensed history.)
+
+  32. ATS Pipeline & Applicant Card Redesign — Removed the horizontal-scrolling
+      Kanban board on mobile in favor of a stacked vertical list; flattened
+      "box-in-a-box" bordered data wrappers inside applicant cards that were
+      causing text truncation; removed truncate/whitespace-nowrap so long
+      titles wrap properly; anchored action buttons full-width at the card
+      bottom. Discovered desktop never actually had a true Kanban (just a flat
+      grid), correcting a mismatched premise in the directive; renamed the
+      underlying class .ats-desktop-grid to .ats-applicant-grid to reflect
+      that.
+
+  33. ATS Dropdown Logic Fix — The "Filter by Job" dropdown's applicant counts
+      were including terminal states (HIRED/REJECTED/WITHDRAWN), which misled
+      HR users; fixed to count only active/actionable statuses (PENDING,
+      ACCEPTED, OFFERED), reusing the file's existing ACTIVE_STATUSES
+      constant, plus a new aggregate count for the "All Jobs" option.
+
+  34. ATS Filters, Archive UX & Protected Delete Actions — Added a status
+      filter (Active vs. Closed sub-states) to CompanyATS.jsx; removed
+      Archive/Delete icon buttons from the face of job cards, moving both
+      into a "Danger Zone" inside the Edit Job modal, gated behind
+      window.confirm() at the time; added a backend guard on the job DELETE
+      endpoint refusing a hard-delete for any job with existing application
+      history (must archive instead). This round's tail also began the
+      original PDF-viewer feature (PdfViewerModal.jsx, usePdfViewer.js) — the
+      direct seed of the "Archive/Delete/View Resume broken on mobile" work
+      that Phase 2 below picks up and fixes.
+
+Key reusable pieces established in this phase (still in use today):
+  - ConfirmModal component (frontend/src/components/ApplicantPipelineParts.jsx) —
+    the app's own React-based confirmation dialog, used everywhere a destructive
+    action needs confirming (window.confirm() itself was only fully retired in
+    favor of this in Phase 2, below — round 34 still used it).
+  - The cross-breakpoint CSS "order" technique — base-level (non-mobile-gated)
+    flex + order rules placed outside the @media query, with mobile-scoped
+    overrides inside, letting the same DOM order render differently at each
+    breakpoint without duplicating markup. Landed after several iterations
+    (rounds 19-26) for .mobile-app-card (Student Applications History cards).
+  - The "position:relative; z-index:99999 !important; pointer-events:auto
+    !important" fix pattern for links/buttons that are unclickable on mobile due
+    to a stacking-context/overlap issue — first applied in round 20 to
+    .mobile-app-resume-link, reused multiple times since.
+  - The "Table-to-Card" data-label pattern (round 12) and the page-scoped
+    wireframe class naming convention (round 14 onward, e.g. auth-mobile-*,
+    mobile-app-*) — the two structural approaches most later mobile work in
+    this project builds on.
+
+--------------------------------------------------------------------------------
+ PHASE 2 — MOBILE CLICK-THROUGH FIXES + IN-APP PDF VIEWER  (v1)
+--------------------------------------------------------------------------------
+Reported bugs (mobile only):
+  1. Company Portal: "Archive Job" and "Delete Job" buttons in the job-edit
+     Danger Zone did nothing when tapped.
+  2. "View Resume PDF" did nothing when tapped, for every applicant, across the
+     Company Applicant Pipeline.
+  3. Feature request: tapping "View Resume" should open an in-app PDF
+     viewer/popup letting the user view or download the PDF, instead of the
+     (broken) old behaviour.
+
+Root causes found:
+  - Danger Zone buttons: both handlers started with a bare
+    "if (!confirm(...)) return;" — window.confirm() is a native browser dialog
+    known to be unreliable/silently suppressed in various mobile WebViews/in-app
+    browsers.
+  - Resume/offer links: the exact same "unclickable on mobile" stacking-context
+    bug already fixed once for .mobile-app-resume-link, but never ported to the
+    Applicant Pipeline's own resume/offer-letter links.
+
+Changes made:
+  - backend/controllers/companyController.js — added hardDeleteJob (validates
+    ownership, blocks deletion if the job has any Application history, otherwise
+    destroys it). backend/routes/companyRoutes.js — added the corresponding
+    DELETE /company/jobs/:id/permanent route. (The pre-existing DELETE
+    /company/jobs/:id route was already a soft-delete/archive, not a true
+    delete — confirmed via code inspection before adding the new route.)
+  - frontend/src/pages/company/CompanyManageJobs.jsx — Danger Zone's
+    handleDelete/handleHardDelete rewritten to use the app's own ConfirmModal
+    (via a small confirmAction state) instead of window.confirm().
+  - frontend/src/index.css — added the proven z-index/pointer-events fix to
+    .mobile-form-actions button and to .applicant-card-actions a.
+  - NEW frontend/src/components/PdfViewerModal.jsx and
+    frontend/src/hooks/usePdfViewer.js — a reusable "view this PDF" hook +
+    modal: on mobile, opens an in-app modal; on desktop, behaviour is
+    unchanged (window.open in a new tab). First version used a plain
+    <iframe src="..."> to display the PDF, built on the existing
+    .layer-overlay/.layer-panel modal shell.
+  - Rolled out to every resume/offer-letter link app-wide (11 links across 6
+    files): ApplicantPipelineParts.jsx (ApplicantCard + ClosedApplicantCard),
+    StudentProfile.jsx, StudentApplications.jsx, StudentProfileModal.jsx,
+    SupervisorStudentDetail.jsx, StudentDashboard.jsx. Two other files
+    (CompanyATS.jsx, ApplicantPipelinePanel.jsx) were checked and confirmed to
+    only pass data through as props — no direct link to convert.
+
+--------------------------------------------------------------------------------
+ PHASE 3 — PDF VIEWER BUG-FIX ROUND  (v2 — the working version)
+--------------------------------------------------------------------------------
+User report after live mobile testing of Phase 2's PDF viewer: tapping "View
+Resume" immediately prompted a native file download instead of showing anything;
+the popup, when it did appear, looked like a full-page takeover instead of a
+small popout box; and the underlying "View Resume" button was visible showing
+through/behind the popup.
+
+Investigation & root causes:
+  - Mobile browsers (Chrome for Android, many in-app WebViews) generally cannot
+    render a PDF embedded in a plain <iframe> the way desktop browsers can —
+    when they can't, the common fallback is to auto-download the file instead.
+    This was the real cause of both the "prompts a download" and "viewer doesn't
+    work" symptoms — one root cause, two symptoms.
+  - The popup reused .layer-overlay/.layer-panel, whose shared mobile CSS forces
+    a 100vw/100dvh full-screen takeover (correct for other modals that use that
+    shell, wrong for this one).
+  - Live testing in a real mobile-width browser session found a second, more
+    subtle bug: the new popup's z-index (99999) exactly tied with the z-index
+    already given to the resume link itself in Phase 2's CSS fix. On a tie,
+    later DOM order wins the paint order — and the underlying button happened
+    to be later in the DOM, so it visually rendered on top of the popup.
+
+Changes made (frontend/src/components/PdfViewerModal.jsx rewritten):
+  - Added the "react-pdf" npm package (wraps pdfjs-dist) so the PDF is rendered
+    onto a <canvas> by the app itself, independent of whatever PDF support the
+    device's browser/WebView does or doesn't have.
+  - Replaced .layer-overlay/.layer-panel with new dedicated classes
+    (.pdf-viewer-overlay / .pdf-viewer-panel, added to index.css inside the
+    mobile media query) sized as a genuine small centered popout box (~480px
+    wide, ~82vh tall, capped height) instead of a full-screen takeover.
+  - Download button switched from a plain <a href download> (silently ignored
+    cross-origin on some browsers) to a fetch -> blob -> objectURL ->
+    programmatic-click flow, which reliably forces a real save regardless of
+    origin.
+  - Bumped the popup's z-index to 999999 so it can never tie with any other
+    element's 99999 in this codebase again.
+  - Verified live in a real headless-browser session at both mobile and desktop
+    viewport widths, with a real (non-blank) resume PDF, including confirming
+    the Download button triggers an actual browser file-download event and
+    that desktop's existing window.open-in-new-tab behaviour is completely
+    unchanged.
+
+--------------------------------------------------------------------------------
+ PHASE 4 — PROFILE AVATAR CENTERING FIX
+--------------------------------------------------------------------------------
+Report: on the mobile Company Profile page, the circular company logo/avatar
+overlapping the cover photo was not horizontally centered.
+
+Root cause: the avatar wrapper is position:absolute on desktop (deliberately
+overlapping the cover banner, "left: 24px"). A prior mobile fix correctly
+switched it to position:relative plus flexbox centering, but never cancelled
+the old inline "left: 24px", which still applied as a relative offset once the
+element returned to normal flow — nudging it off-centre.
+
+Change made: frontend/src/index.css — added "top: auto !important; left: auto
+!important;" to the existing .mobile-profile-header .mobile-profile-avatar-wrap
+rule. This one shared CSS class is used by both Company Profile and Student
+Profile, so both were fixed and verified in the same change.
+
+--------------------------------------------------------------------------------
+ PHASE 5 — JOB LISTINGS "LIST VIEW" REDESIGN + STUDENT GRID/LIST TOGGLE
+--------------------------------------------------------------------------------
+Report: the Company "Job Listings" page has two view modes (grid card / list
+row); on mobile, the list-row view still used its desktop single-line flex row
+with no mobile treatment, so it wrapped awkwardly (logo and location sharing a
+line, title truncating to one line, buttons and price scattering onto their own
+lines). The user wanted it redesigned to match the flat, card-based look already
+used by the Student "Job Application History" cards, and separately asked for
+the same grid/list toggle to be added to the Student "Find Internships" (browse
+jobs) page, so both portals end up with two consistent ways to view job listings.
+
+Changes made:
+  - frontend/src/index.css — Company's list-row inline styles were converted
+    into a small set of shared classes: .job-list-row, .job-list-logo,
+    .job-list-info, .job-list-title, .job-list-meta, .job-list-actions. Base
+    (non-mobile) rules exactly reproduce the original desktop appearance (pixel
+    parity preserved); a new mobile media-query subsection gives them the
+    "History card" treatment: flat bordered card, larger inline logo, unclamped
+    (fully wrapping) title, wrapped meta row, actions pinned to their own
+    full-width line at the bottom (reusing the same flex-basis:100% technique
+    already used for .app-card-status-actions).
+  - frontend/src/pages/company/CompanyManageJobs.jsx — list-view branch
+    switched from inline styles to the new shared classes (no behaviour change).
+  - frontend/src/pages/student/StudentJobSearch.jsx — added a grid/list toggle
+    (mirroring Company's exact toggle UI/state pattern, defaulting to 'grid' so
+    existing default behaviour is unchanged) and a new JobListRow component
+    using the same shared .job-list-* classes, with student-appropriate content
+    (Save/bookmark button instead of management buttons, whole row clickable to
+    open the job detail modal).
+  - Verified live at both breakpoints for both portals: desktop list view is
+    pixel-identical to before; mobile list view now matches the History-card
+    look on both pages; grid views on both pages confirmed completely
+    untouched.
+
+--------------------------------------------------------------------------------
+ PHASE 6 — THEME TOGGLE REDESIGN (APPLE/iOS-STYLE SWITCH)
+--------------------------------------------------------------------------------
+Report: the dark/light mode control was a bare Sun/Moon icon button with no
+track or pill shape — looked "weird" on both mobile and desktop. Requested an
+Apple-style sliding switch instead (pill track, sun/moon at each end, a knob
+that slides left/right).
+
+This exact bare-icon-button snippet was duplicated 8 times across the app (2
+occurrences — desktop sidebar header + mobile top header — in each of
+CompanyLayout.jsx, StudentLayout.jsx, SupervisorLayout.jsx, AdminLayout.jsx).
+
+Changes made:
+  - NEW frontend/src/components/ThemeToggle.jsx — a single reusable component
+    (pulls toggle/isDark/c from the existing useTheme() hook itself) rendering
+    a pill-shaped track with a Sun icon fixed at the left end, a Moon icon fixed
+    at the right end, and a circular knob that slides between them via a CSS
+    transform transition. The whole track is the click target.
+  - All 8 call sites across the 4 layout files swapped to <ThemeToggle />; the
+    now-unused Sun/Moon lucide-react imports and isDark/toggle destructuring
+    were removed from those files.
+  - Bug found during live verification: a pre-existing global mobile CSS rule
+    ("a, button, [role='button'] { min-height: 44px; min-width: 44px; }" —
+    a Material-Design touch-target-size rule applying to every button on
+    mobile) was overriding the switch's intended small size via min-height,
+    blowing it up into an oversized 44px-tall blob. Fixed by adding a scoped
+    ".theme-toggle { min-height: 28px !important; min-width: 50px !important; }"
+    override — a deliberate, explained exception, since a slider switch is
+    conventionally smaller than a tap target (iOS's own switch is ~31px tall).
+  - Verified live at both breakpoints; confirmed identical rendering across
+    Student and Supervisor portals (Company/Admin share the same component so
+    are covered by construction).
+
+--------------------------------------------------------------------------------
+ CURRENT STATE / FILES TOUCHED THIS SESSION (Phases 2-6)
+--------------------------------------------------------------------------------
+Backend:
+  backend/controllers/companyController.js   (hardDeleteJob)
+  backend/routes/companyRoutes.js            (DELETE /jobs/:id/permanent)
+
+Frontend — new files:
+  frontend/src/components/PdfViewerModal.jsx
+  frontend/src/hooks/usePdfViewer.js
+  frontend/src/components/ThemeToggle.jsx
+
+Frontend — modified files:
+  frontend/src/index.css
+  frontend/src/pages/company/CompanyManageJobs.jsx
+  frontend/src/components/ApplicantPipelineParts.jsx
+  frontend/src/pages/student/StudentProfile.jsx
+  frontend/src/pages/student/StudentApplications.jsx
+  frontend/src/components/StudentProfileModal.jsx
+  frontend/src/pages/supervisor/SupervisorStudentDetail.jsx
+  frontend/src/pages/student/StudentDashboard.jsx
+  frontend/src/pages/student/StudentJobSearch.jsx
+  frontend/src/components/layouts/CompanyLayout.jsx
+  frontend/src/components/layouts/StudentLayout.jsx
+  frontend/src/components/layouts/SupervisorLayout.jsx
+  frontend/src/components/layouts/AdminLayout.jsx
+  frontend/package.json / package-lock.json  (added dependency: react-pdf)
+
+All changes in this document have been build-verified (npm run build, zero
+errors) and, where UI-visible, checked live in-browser at both mobile (390px)
+and desktop (1440px) viewport widths.
+
+================================================================================
+ END OF DOCUMENT
+================================================================================

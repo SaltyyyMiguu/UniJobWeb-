@@ -1,0 +1,56 @@
+# Environment variables — NEVER commit these. Contain live secrets: DB
+# credentials, JWT secret, SMTP account + app password.
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Dependencies
+node_modules/
+
+# Uploaded user content (resumes, profile images, offer letters, listing
+# covers) — user data, not source code, and can be large.
+backend/uploads/
+uploads/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS / editor / local tooling — not project source
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.claude/
+.playwright-mcp/
+
+# Local backup archives created during deployment prep
+*.zip
+*.tar.gz
+
+# Ad-hoc debugging/verification screenshots dumped at the repo root during
+# development — not app assets. (Leading slash = root only, so this doesn't
+# touch real assets like frontend/src/assets/ or frontend/public/.)
+/*.png
+/*.jpg
+/*.jpeg
+
+# Personal academic submission documents — not source code, and the .docx
+# filename embeds a student ID. Doesn't belong in a public repo.
+*.pptx
+*.docx
