@@ -12,6 +12,12 @@ const { cleanupLegacyJobs } = require('./cleanup-legacy-jobs');
 dotenv.config();
 
 const app = express();
+// Render (and most PaaS hosts) sit behind a reverse proxy, so Express sees
+// the proxy's IP on every request unless told to trust the X-Forwarded-For
+// header. Without this, express-rate-limit (login/OTP limiters) either
+// throws or keys every user under the same proxy IP, rate-limiting the
+// whole app as if it were one client.
+app.set('trust proxy', 1);
 const httpServer = createServer(app);
 
 // Local dev origins stay allowed unconditionally; FRONTEND_URL (the deployed
