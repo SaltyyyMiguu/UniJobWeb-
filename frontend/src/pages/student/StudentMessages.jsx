@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Send, MessageSquare, Wifi, WifiOff, Building2, Lock, ArrowLeft } from 'lucide-react';
 
-const SOCKET_URL = '${API_BASE_URL}';
+const SOCKET_URL = API_BASE_URL;
 
 export default function StudentMessages() {
   const { user } = useAuth();
@@ -38,6 +38,7 @@ export default function StudentMessages() {
 
     const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
+      withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
