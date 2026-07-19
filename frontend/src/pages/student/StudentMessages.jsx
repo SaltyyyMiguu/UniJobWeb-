@@ -6,7 +6,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Send, MessageSquare, Wifi, WifiOff, Building2, Lock, ArrowLeft } from 'lucide-react';
 
-const SOCKET_URL = API_BASE_URL;
+// Strip a trailing /api if present — Socket.IO treats any path segment
+// after the origin as a namespace, so a URL ending in /api would try to
+// connect to an "/api" namespace (which the server never registers)
+// instead of the default namespace, and fail silently into a reconnect
+// loop. API_BASE_URL itself is just the bare origin in this codebase, but
+// this guards against VITE_API_URL ever being configured with /api on the
+// hosting side.
+const SOCKET_URL = API_BASE_URL.replace(/\/api$/, '');
 
 export default function StudentMessages() {
   const { user } = useAuth();
