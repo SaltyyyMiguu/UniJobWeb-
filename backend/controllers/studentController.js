@@ -388,7 +388,10 @@ const markUpdatesSeen = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { userId: req.user.id } });
     if (!student) return res.status(404).json({ message: 'Student not found.' });
-    const { applicationId } = req.body;
+    // req.body is undefined (not {}) when a request has no body at all —
+    // StudentLayout.jsx's "mark all as seen" call does exactly this
+    // (api.post(url) with no data argument), which crashed the destructure.
+    const { applicationId } = req.body || {};
     const where = { studentId: student.id, studentSeenAt: null };
     if (applicationId) where.id = applicationId;
     await Application.update({ studentSeenAt: new Date() }, { where });
