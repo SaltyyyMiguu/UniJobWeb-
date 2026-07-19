@@ -21,6 +21,11 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // Render's outbound network doesn't have working IPv6 egress, so
+  // connecting to Gmail's SMTP host (which resolves to an AAAA/IPv6
+  // address) fails with ENETUNREACH unless the socket is forced to
+  // resolve/connect over IPv4 instead.
+  family: 4,
 });
 
 // ─── Shared HTML shell — matches the app's UCSI crimson branding ─────────────
