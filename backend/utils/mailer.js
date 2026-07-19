@@ -50,8 +50,15 @@ function wrapTemplate({ heading, body, ctaLink = `${FRONTEND_URL}/login`, ctaLab
 async function dispatch(to, subject, html) {
   try {
     if (!to) { console.error('[mailer] Skipped send — no recipient email provided.'); return; }
+    // Brevo (and most transactional SMTP relays) authenticate with a login ID
+    // that isn't itself a deliverable address — the "From" sender has to be a
+    // separately verified address/domain from the provider's dashboard, or
+    // sends get rejected with a sender validation error. SENDER_EMAIL lets
+    // that verified address be configured independently of SMTP_USER; falls
+    // back to SMTP_USER for providers (like Gmail) where they're the same.
+    const senderAddress = process.env.SENDER_EMAIL || process.env.SMTP_USER;
     await transporter.sendMail({
-      from: process.env.SMTP_USER ? `"UniJobLink" <${process.env.SMTP_USER}>` : 'UniJobLink <no-reply@unijoblink.local>',
+      from: senderAddress ? `"UniJobLink" <${senderAddress}>` : 'UniJobLink <no-reply@unijoblink.local>',
       to, subject, html,
     });
   } catch (error) {
