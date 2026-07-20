@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.webp';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -43,9 +44,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
-              <div style={{ width: '32px', height: '32px', background: '#C41E3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: '#fff', fontWeight: '900', fontSize: '16px' }}>U</span>
-              </div>
+              <img src={logo} alt="UniJobLink" style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: '6px', flexShrink: 0 }} />
               <div>
                 <p style={{ color: '#fff', fontWeight: '700', fontSize: '15px', letterSpacing: '-0.02em', margin: 0 }}>UniJobLink</p>
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: 0, letterSpacing: '0.05em', textTransform: 'uppercase' }}>UCSI University</p>
@@ -102,9 +101,7 @@ export default function LoginPage() {
         }} className="max-md:flex md:hidden">
           {/* Logo section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-            <div style={{ width: '32px', height: '32px', background: c.red, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
-              <span style={{ color: '#fff', fontWeight: '900', fontSize: '16px' }}>U</span>
-            </div>
+            <img src={logo} alt="UniJobLink" style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: '6px', flexShrink: 0 }} />
             <div>
               <p style={{ fontWeight: '700', fontSize: '15px', color: c.txt1, margin: 0, letterSpacing: '-0.01em' }}>UniJobLink</p>
               <p style={{ fontSize: '11px', color: c.red, margin: 0, fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>UCSI University</p>

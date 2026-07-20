@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import logo from '../assets/logo.webp';
 
 export default class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -20,9 +21,7 @@ export default class ErrorBoundary extends Component {
           fontFamily: 'Inter, sans-serif', padding: '24px', textAlign: 'center',
           background: '#F7F7F5',
         }}>
-          <div style={{ width: '40px', height: '40px', background: '#C41E3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#fff', fontWeight: '900', fontSize: '18px' }}>U</span>
-          </div>
+          <img src={logo} alt="UniJobLink" style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '8px', flexShrink: 0 }} />
           <h1 style={{ fontSize: '20px', fontWeight: '700', color: '#111', letterSpacing: '-0.02em', margin: 0 }}>Something went wrong.</h1>
           <p style={{ fontSize: '14px', color: '#666', maxWidth: '360px', margin: 0, lineHeight: '1.6' }}>
             An unexpected error occurred. Try reloading the page — if it keeps happening, please contact support.

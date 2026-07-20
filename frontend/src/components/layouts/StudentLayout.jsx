@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import api, { API_BASE_URL } from '../../api/axios';
 import ThemeToggle from '../ThemeToggle';
+import logo from '../../assets/logo.webp';
 
 export default function StudentLayout({ children }) {
   const { profile } = useAuth();
@@ -45,9 +46,7 @@ export default function StudentLayout({ children }) {
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${c.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '28px', height: '28px', background: c.red, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <span style={{ color: '#fff', fontWeight: '900', fontSize: '13px' }}>U</span>
-          </div>
+          <img src={logo} alt="UniJobLink" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '6px', flexShrink: 0 }} />
           <div>
             <p style={{ fontWeight: '700', fontSize: '13px', color: c.txt1, margin: 0, letterSpacing: '-0.01em' }}>UniJobLink</p>
             <p style={{ fontSize: '10px', color: c.txt3, margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>UCSI University</p>
@@ -122,9 +121,7 @@ export default function StudentLayout({ children }) {
       </aside>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: '220px' }} className="max-md:ml-0 main-content-wrapper">
         <header style={{ background: c.surface, borderBottom: `1px solid ${c.border}`, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', position: 'sticky', top: 0, zIndex: 10 }} className="md:hidden">
-          <div style={{ width: '22px', height: '22px', background: c.red, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#fff', fontWeight: '900', fontSize: '10px' }}>U</span>
-          </div>
+          <img src={logo} alt="UniJobLink" style={{ width: '22px', height: '22px', objectFit: 'contain', borderRadius: '5px', flexShrink: 0 }} />
           <span style={{ fontWeight: '700', fontSize: '13px', color: c.txt1 }}>UniJobLink</span>
           <div style={{ marginLeft: 'auto' }}>
             <ThemeToggle />

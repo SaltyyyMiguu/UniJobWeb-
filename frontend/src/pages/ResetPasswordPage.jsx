@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.webp';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -26,9 +27,7 @@ export default function ResetPasswordPage() {
     <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: 'var(--bg, #F7F7F5)', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '40px' }}>
-          <div style={{ width: '26px', height: '26px', background: '#C41E3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#fff', fontWeight: '900', fontSize: '12px' }}>U</span>
-          </div>
+          <img src={logo} alt="UniJobLink" style={{ width: '26px', height: '26px', objectFit: 'contain', borderRadius: '5px', flexShrink: 0 }} />
           <span style={{ fontWeight: '700', fontSize: '14px', color: 'var(--txt-1, #111)' }}>UniJobLink</span>
         </div>
 

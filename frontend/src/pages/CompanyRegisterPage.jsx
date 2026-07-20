@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import EmailOtpField from '../components/EmailOtpField';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.webp';
 
 const INDUSTRIES = [
   'Information Technology', 'Finance & Banking', 'Healthcare',
@@ -42,9 +43,7 @@ export default function CompanyRegisterPage() {
         <div style={{ position: 'absolute', bottom: 0, left: 0, width: '50%', height: '2px', background: '#C41E3A' }} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '56px' }}>
-          <div style={{ width: '28px', height: '28px', background: '#C41E3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#fff', fontWeight: '900', fontSize: '13px' }}>U</span>
-          </div>
+          <img src={logo} alt="UniJobLink" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '6px', flexShrink: 0 }} />
           <div>
             <p style={{ color: '#fff', fontWeight: '700', fontSize: '14px', margin: 0 }}>UniJobLink</p>
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>UCSI University</p>
