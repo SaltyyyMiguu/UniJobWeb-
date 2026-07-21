@@ -23,7 +23,7 @@ function makeImageUpload({ folder, prefix, maxSizeMB }) {
     cloudinary,
     params: () => ({
       folder,
-      allowed_formats: ['jpeg', 'png', 'jpg'],
+      allowed_formats: ['jpeg', 'png', 'jpg', 'webp', 'gif'],
       resource_type: 'image',
       public_id: `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
     }),
