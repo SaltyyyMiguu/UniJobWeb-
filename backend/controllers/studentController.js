@@ -75,8 +75,8 @@ const uploadResume = async (req, res) => {
     await student.save();
     res.json({ message: 'Resume uploaded successfully.', resumeUrl: student.resumeUrl });
   } catch (error) {
-    console.error('[Failed to upload resume.] DB error:', error);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Failed to upload resume.] Resume upload error:', error);
+    res.status(500).json({ message: 'Upload failed', error: error.message || error });
   }
 };
 
@@ -89,8 +89,8 @@ const uploadProfileImage = async (req, res) => {
     await student.save();
     res.json({ message: 'Profile image uploaded.', profileImageUrl: student.profileImageUrl });
   } catch (error) {
-    console.error('[Failed to upload profile image.] DB error:', error);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Failed to upload profile image.] Profile image upload error:', error);
+    res.status(500).json({ message: 'Upload failed', error: error.message || error });
   }
 };
 

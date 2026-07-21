@@ -45,8 +45,8 @@ const uploadCoverPhoto = async (req, res) => {
 
     res.status(403).json({ message: 'Only students and companies can set a cover photo.' });
   } catch (error) {
-    console.error('[Failed to update cover photo.] DB error:', error);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Failed to update cover photo.] Cover photo upload error:', error);
+    res.status(500).json({ message: 'Upload failed', error: error.message || error });
   }
 };
 

@@ -56,6 +56,20 @@ app.use('/api/company',    require('./routes/companyRoutes'));
 app.use('/api/supervisor', require('./routes/supervisorRoutes'));
 app.use('/api/users',      require('./routes/userRoutes'));
 
+// ─── Error handler ─────────────────────────────────────────────────────────
+// Catches errors that never reach a controller's own try/catch — most
+// importantly multer/Cloudinary upload failures (bad credentials, fileFilter
+// rejections, size-limit errors), which fire via next(err) from inside the
+// upload middleware itself. Without this, Express's default handler logs
+// err.stack || err.toString() — and Cloudinary SDK errors are often plain
+// objects with no .stack, so that toString() call prints "[object Object]".
+app.use((err, req, res, next) => {
+  if (!err) return next();
+  console.error('[Unhandled error]', err);
+  const status = err.status || err.http_code || 500;
+  res.status(status).json({ message: 'Upload failed', error: err.message || err });
+});
+
 // ─── In-memory: track which socket is viewing which room ─────────────────
 // activeRooms[userId] = roomId — used to decide whether to emit unread event
 const activeRooms = new Map();

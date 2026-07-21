@@ -515,8 +515,8 @@ const uploadProfileImage = async (req, res) => {
     await company.save();
     res.json({ message: 'Logo updated.', profileImageUrl: company.profileImageUrl });
   } catch (err) {
-    console.error('[Upload failed.] DB error:', err);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Upload failed.] Company profile image upload error:', err);
+    res.status(500).json({ message: 'Upload failed', error: err.message || err });
   }
 };
 
@@ -531,8 +531,8 @@ const uploadJobImage = async (req, res) => {
     await job.save();
     res.json({ message: 'Listing image updated.', listingImageUrl: job.listingImageUrl });
   } catch (err) {
-    console.error('[Upload failed.] DB error:', err);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Upload failed.] Job listing image upload error:', err);
+    res.status(500).json({ message: 'Upload failed', error: err.message || err });
   }
 };
 
@@ -623,8 +623,8 @@ const uploadOfferLetter = async (req, res) => {
     await application.save();
     res.json({ message: 'Offer letter uploaded.', offerLetterUrl: application.offerLetterUrl });
   } catch (err) {
-    console.error('[Upload failed.] DB error:', err);
-    res.status(500).json({ message: 'Internal server error. Please try again later.' });
+    console.error('[Upload failed.] Offer letter upload error:', err);
+    res.status(500).json({ message: 'Upload failed', error: err.message || err });
   }
 };
 
