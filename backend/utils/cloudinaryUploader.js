@@ -39,16 +39,23 @@ function makeImageUpload({ folder, prefix, maxSizeMB }) {
 }
 
 // ─── PDF uploads (resumes, offer letters) ─────────────────────────────────────
-// resource_type MUST be 'raw' — Cloudinary's default 'image' resource type
-// will reject or mangle a PDF as a "corrupted image" since it isn't one.
-// 'raw' stores the file's bytes as-is, which is what an arbitrary binary
-// like a PDF needs.
+// resource_type: 'image' — Cloudinary treats PDFs as a special image type
+// (page rasterization, thumbnails, transformations) and serves them with the
+// inline-viewing + CORS headers browsers need to render them directly.
+// 'raw' delivery doesn't carry those headers, which is why PDFs uploaded that
+// way were downloading/failing instead of rendering.
+//
+// NOTE: this requires "Allow delivery of PDF and ZIP files" to be enabled
+// under Console → Settings → Security in the Cloudinary dashboard — accounts
+// created after Cloudinary's 2018 security change have this OFF by default,
+// and PDFs uploaded as 'image' will 401 on delivery until it's turned on.
 function makePdfUpload({ folder, prefix, maxSizeMB }) {
   const storage = new CloudinaryStorage({
     cloudinary,
     params: () => ({
       folder,
-      resource_type: 'raw',
+      resource_type: 'image',
+      allowed_formats: ['pdf'],
       format: 'pdf',
       public_id: `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
     }),
