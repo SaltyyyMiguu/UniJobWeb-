@@ -1,64 +1,12 @@
 const { Op } = require('sequelize');
 const { Company, JobPosting, Application, Student, User, ChatRoom, Message, sequelize } = require('../models');
-const multer = require('multer');
-const path = require('path');
 const cache = require('../utils/cache');
 const { sendStudentEmail } = require('../utils/mailer');
-
-// ─── Multer: company profile image ───────────────────────────────────────────
-const profileImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/profiles/'),
-  filename: (req, file, cb) => {
-    const u = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'company-' + u + path.extname(file.originalname));
-  }
-});
-const uploadProfileImageMulter = multer({
-  storage: profileImageStorage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Images only'), false);
-  },
-  limits: { fileSize: 3 * 1024 * 1024 }
-});
-
-// ─── Multer: job listing images ───────────────────────────────────────────────
-const listingImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/listings/'),
-  filename: (req, file, cb) => {
-    const u = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'listing-' + u + path.extname(file.originalname));
-  }
-});
-const uploadListingImageMulter = multer({
-  storage: listingImageStorage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Images only'), false);
-  },
-  limits: { fileSize: 5 * 1024 * 1024 }
-});
-
-// ─── Multer: offer letter PDFs ────────────────────────────────────────────────
-// Extension is hardcoded to .pdf regardless of the client-supplied originalname —
-// never trust an attacker-controlled filename for the extension that express.static
-// will use to infer Content-Type when serving the stored file.
-const offerLetterStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/offers/'),
-  filename: (req, file, cb) => {
-    const u = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'offer-' + u + '.pdf');
-  }
-});
-const uploadOfferLetterMulter = multer({
-  storage: offerLetterStorage,
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (file.mimetype === 'application/pdf' && ext === '.pdf') cb(null, true);
-    else cb(new Error('PDF only'), false);
-  },
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
+const {
+  uploadCompanyProfileImage: uploadProfileImageMulter,
+  uploadListingImage: uploadListingImageMulter,
+  uploadOfferLetter: uploadOfferLetterMulter,
+} = require('../utils/cloudinaryUploader');
 
 // ─── GET /api/company/profile ─────────────────────────────────────────────────
 const getProfile = async (req, res) => {
@@ -377,7 +325,7 @@ const updateApplicationStatus = async (req, res) => {
 
       // Attach offer letter if uploaded via separate endpoint
       if (req.file) {
-        application.offerLetterUrl = req.file.path.replace(/\\/g, '/');
+        application.offerLetterUrl = req.file.path;
       }
 
       await application.save();
@@ -563,7 +511,7 @@ const uploadProfileImage = async (req, res) => {
   try {
     const company = await Company.findOne({ where: { userId: req.user.id } });
     if (!company) return res.status(404).json({ message: 'Company not found.' });
-    company.profileImageUrl = req.file.path.replace(/\\/g, '/');
+    company.profileImageUrl = req.file.path;
     await company.save();
     res.json({ message: 'Logo updated.', profileImageUrl: company.profileImageUrl });
   } catch (err) {
@@ -579,7 +527,7 @@ const uploadJobImage = async (req, res) => {
     if (!company) return res.status(404).json({ message: 'Company not found.' });
     const job = await JobPosting.findOne({ where: { id: req.params.id, companyId: company.id } });
     if (!job) return res.status(404).json({ message: 'Job not found.' });
-    job.listingImageUrl = req.file.path.replace(/\\/g, '/');
+    job.listingImageUrl = req.file.path;
     await job.save();
     res.json({ message: 'Listing image updated.', listingImageUrl: job.listingImageUrl });
   } catch (err) {
@@ -671,7 +619,7 @@ const uploadOfferLetter = async (req, res) => {
     });
     if (!application) return res.status(404).json({ message: 'Application not found.' });
 
-    application.offerLetterUrl = req.file.path.replace(/\\/g, '/');
+    application.offerLetterUrl = req.file.path;
     await application.save();
     res.json({ message: 'Offer letter uploaded.', offerLetterUrl: application.offerLetterUrl });
   } catch (err) {

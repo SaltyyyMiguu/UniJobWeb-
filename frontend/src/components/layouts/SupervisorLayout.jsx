@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { LayoutDashboard, User } from 'lucide-react';
 import ThemeToggle from '../ThemeToggle';
-import { API_BASE_URL } from '../../api/axios';
+import { resolveFileUrl } from '../../api/axios';
 import logo from '../../assets/logo.webp';
 
 const NAV = [
@@ -16,7 +16,7 @@ export default function SupervisorLayout({ children }) {
   const { c } = useTheme();
 
   const avatarLetter = profile?.firstName?.[0]?.toUpperCase() || 'S';
-  const avatarSrc = profile?.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile?.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
 
   const Sidebar = () => (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: c.surface, borderRight: `1px solid ${c.border}` }}>

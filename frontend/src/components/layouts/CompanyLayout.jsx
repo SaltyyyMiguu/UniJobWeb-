@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { LayoutDashboard, FilePlus, Users, MessageSquare, User } from 'lucide-react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import ThemeToggle from '../ThemeToggle';
 import logo from '../../assets/logo.webp';
 
@@ -31,7 +31,7 @@ export default function CompanyLayout({ children }) {
   ];
 
   const avatarLetter = profile?.companyName?.[0]?.toUpperCase() || 'C';
-  const avatarSrc = profile?.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile?.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
 
   const Sidebar = () => (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: c.surface, borderRight: `1px solid ${c.border}` }}>

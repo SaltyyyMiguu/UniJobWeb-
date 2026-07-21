@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -59,8 +59,8 @@ function OfferedBanner({ app, onAcceptOffer, onDeclineOffer, responding, c }) {
         </div>
       </div>
       {app.offerLetterUrl && (
-        <a href={`${API_BASE_URL}/${app.offerLetterUrl}`} target="_blank" rel="noreferrer"
-          onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.offerLetterUrl}`, 'Offer Letter'); } }}
+        <a href={resolveFileUrl(app.offerLetterUrl)} target="_blank" rel="noreferrer"
+          onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.offerLetterUrl), 'Offer Letter'); } }}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: c.green, fontWeight: '600', padding: '6px 12px', border: '1px solid rgba(26,127,90,0.3)', background: 'rgba(26,127,90,0.07)', marginBottom: '10px', cursor: 'pointer', textDecoration: 'none' }}>
           View Offer Letter PDF
         </a>
@@ -396,7 +396,7 @@ export default function StudentApplications() {
               {historyApps.map(app => {
                 const cfg = STATUS[app.status] || STATUS.REJECTED;
                 const Icon = cfg.icon;
-                const logoSrc = app.JobPosting?.Company?.profileImageUrl ? `${API_BASE_URL}/${app.JobPosting.Company.profileImageUrl}` : null;
+                const logoSrc = app.JobPosting?.Company?.profileImageUrl ? resolveFileUrl(app.JobPosting.Company.profileImageUrl) : null;
                 return (
                   <div key={app.id} className="card mobile-app-card" style={{ padding: '16px 20px', opacity: ['WITHDRAWN', 'AUTO_REJECTED'].includes(app.status) ? 0.7 : 1 }}>
                     <span className={`badge ${cfg.badgeClass}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -419,16 +419,16 @@ export default function StudentApplications() {
                       <div className="mobile-app-actions app-card-status-actions">
                         {/* Resume snapshot link */}
                         {app.resumeSnapshot && (
-                          <a className="mobile-app-resume-link" href={`${API_BASE_URL}/${app.resumeSnapshot}`} target="_blank" rel="noreferrer"
-                            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.resumeSnapshot}`, 'Resume (at time of apply)'); } }}
+                          <a className="mobile-app-resume-link" href={resolveFileUrl(app.resumeSnapshot)} target="_blank" rel="noreferrer"
+                            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.resumeSnapshot), 'Resume (at time of apply)'); } }}
                             style={{ fontSize: '11px', color: c.green, display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
                             📄 Resume (at time of apply)
                           </a>
                         )}
                         {/* Offer letter link */}
                         {app.offerLetterUrl && (
-                          <a className="mobile-app-resume-link" href={`${API_BASE_URL}/${app.offerLetterUrl}`} target="_blank" rel="noreferrer"
-                            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.offerLetterUrl}`, 'Offer Letter'); } }}
+                          <a className="mobile-app-resume-link" href={resolveFileUrl(app.offerLetterUrl)} target="_blank" rel="noreferrer"
+                            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.offerLetterUrl), 'Offer Letter'); } }}
                             style={{ fontSize: '11px', color: '#1D4ED8', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
                             📋 Offer Letter
                           </a>
@@ -451,7 +451,7 @@ function ApplicationCard({ app, c, onWithdraw, withdrawing, onViewCompany, onCon
   const cfg = STATUS[app.status] || STATUS.PENDING;
   const Icon = cfg.icon;
   const logoSrc = app.JobPosting?.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${app.JobPosting.Company.profileImageUrl}`
+    ? resolveFileUrl(app.JobPosting.Company.profileImageUrl)
     : null;
   const logoLetter = app.JobPosting?.Company?.companyName?.[0] || 'C';
 

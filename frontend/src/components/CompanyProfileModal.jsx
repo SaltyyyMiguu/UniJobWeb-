@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { X, Globe, ExternalLink, Phone, MapPin, Building2, Users, Calendar, CheckCircle } from 'lucide-react';
-import api, { API_BASE_URL } from '../api/axios';
+import api, { resolveFileUrl } from '../api/axios';
 
 export default function CompanyProfileModal({ companyId, companyName, onClose }) {
   const { c } = useTheme();
@@ -15,7 +15,7 @@ export default function CompanyProfileModal({ companyId, companyName, onClose })
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  const avatarSrc = profile?.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile?.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
   const avatarLetter = (profile?.companyName || companyName || 'C')[0].toUpperCase();
 
   return (

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import JobDetailModal from '../../components/JobDetailModal';
 import { useTheme } from '../../context/ThemeContext';
@@ -21,13 +21,13 @@ function JobCard({ job, applied, saved, onOpen, onToggleSave, c }) {
 
   // Cover image: job's own listing image OR company logo — if NEITHER exists, no animation
   const coverSrc = job.listingImageUrl
-    ? `${API_BASE_URL}/${job.listingImageUrl}`
+    ? resolveFileUrl(job.listingImageUrl)
     : job.Company?.profileImageUrl
-      ? `${API_BASE_URL}/${job.Company.profileImageUrl}`
+      ? resolveFileUrl(job.Company.profileImageUrl)
       : null;
 
   const logoSrc = job.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${job.Company.profileImageUrl}`
+    ? resolveFileUrl(job.Company.profileImageUrl)
     : null;
 
   // Only animate if there is actually an image to show AND the device has
@@ -154,7 +154,7 @@ function JobCard({ job, applied, saved, onOpen, onToggleSave, c }) {
 // Jobs page's list view, so both portals get the identical row look at
 // every breakpoint (desktop: compact single line; mobile: flat card). ───────
 function JobListRow({ job, applied, saved, onOpen, onToggleSave, c }) {
-  const logoSrc = job.Company?.profileImageUrl ? `${API_BASE_URL}/${job.Company.profileImageUrl}` : null;
+  const logoSrc = job.Company?.profileImageUrl ? resolveFileUrl(job.Company.profileImageUrl) : null;
   return (
     <div className="card job-list-row" style={{ cursor: 'pointer' }} onClick={() => onOpen(job)}>
       <div className="job-list-logo" style={{ background: logoSrc ? 'transparent' : c.red }}>

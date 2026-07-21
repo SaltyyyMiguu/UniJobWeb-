@@ -65,6 +65,10 @@ const Student = sequelize.define('Student', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  coverPhotoUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   // FK to Supervisor.id (not User.id) — null means no supervisor request has been made yet
   supervisorId: {
     type: DataTypes.UUID,

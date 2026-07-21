@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import SupervisorLayout from '../../components/layouts/SupervisorLayout';
 import { useTheme } from '../../context/ThemeContext';
 import { PIPELINE } from '../../components/ApplicantPipelineParts';
@@ -12,7 +12,7 @@ import PdfViewerModal from '../../components/PdfViewerModal';
 function PlacementCard({ app, onApprove, onReject, acting, c }) {
   const pipeline = PIPELINE[app.status] || PIPELINE.PENDING;
   const logoSrc = app.JobPosting?.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${app.JobPosting.Company.profileImageUrl}`
+    ? resolveFileUrl(app.JobPosting.Company.profileImageUrl)
     : null;
   const { viewerUrl, viewerTitle, openPdf, closePdf } = usePdfViewer();
 
@@ -36,15 +36,15 @@ function PlacementCard({ app, onApprove, onReject, acting, c }) {
 
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: (app.resumeSnapshot || app.offerLetterUrl || app.status === 'HIRED') ? '10px' : 0 }}>
         {app.resumeSnapshot && (
-          <a href={`${API_BASE_URL}/${app.resumeSnapshot}`} target="_blank" rel="noreferrer"
-            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.resumeSnapshot}`, 'Resume'); } }}
+          <a href={resolveFileUrl(app.resumeSnapshot)} target="_blank" rel="noreferrer"
+            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.resumeSnapshot), 'Resume'); } }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: c.green, fontWeight: '600', padding: '6px 12px', border: '1px solid rgba(26,127,90,0.3)', background: 'rgba(26,127,90,0.07)' }}>
             <FileText size={12} />View Resume
           </a>
         )}
         {app.offerLetterUrl && (
-          <a href={`${API_BASE_URL}/${app.offerLetterUrl}`} target="_blank" rel="noreferrer"
-            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.offerLetterUrl}`, 'Offer Letter'); } }}
+          <a href={resolveFileUrl(app.offerLetterUrl)} target="_blank" rel="noreferrer"
+            onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.offerLetterUrl), 'Offer Letter'); } }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#1D4ED8', fontWeight: '600', padding: '6px 12px', border: '1px solid rgba(29,78,216,0.3)', background: 'rgba(29,78,216,0.07)' }}>
             <FileText size={12} />View Offer Letter PDF
           </a>

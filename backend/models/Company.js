@@ -60,6 +60,10 @@ const Company = sequelize.define('Company', {
   profileImageUrl: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  coverPhotoUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 }, {
   timestamps: true,

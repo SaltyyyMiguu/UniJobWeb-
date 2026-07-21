@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -51,15 +51,24 @@ export default function StudentProfile() {
   const [selectedSupervisorId, setSelectedSupervisorId] = useState('');
   const [requestingSupervisor, setRequestingSupervisor] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop');
+  const DEFAULT_COVER = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop';
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState(DEFAULT_COVER);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const { viewerUrl, viewerTitle, openPdf, closePdf } = usePdfViewer();
 
-  // Client-side preview only (URL.createObjectURL) — nothing is uploaded to the
-  // server, so this resets to the placeholder above on refresh until a real
-  // cover-photo upload endpoint exists.
-  const handleCoverChange = (e) => {
+  const handleCoverChange = async (e) => {
     const file = e.target.files[0];
-    if (file) setCoverPhotoUrl(URL.createObjectURL(file));
+    if (!file) return;
+    const fd = new FormData(); fd.append('coverPhoto', file);
+    setUploadingCover(true);
+    try {
+      const r = await api.post('/users/cover-photo', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCoverPhotoUrl(resolveFileUrl(r.data.coverPhotoUrl));
+      toast.success('Cover photo updated!');
+    } catch { toast.error('Cover photo upload failed.'); }
+    setUploadingCover(false);
   };
 
   const loadProfile = () => {
@@ -68,6 +77,7 @@ export default function StudentProfile() {
       .then(r => {
         setProfile(r.data);
         setForm(r.data);
+        setCoverPhotoUrl(r.data.coverPhotoUrl ? resolveFileUrl(r.data.coverPhotoUrl) : DEFAULT_COVER);
         try { setSkills(JSON.parse(r.data.skills || '[]')); } catch { setSkills([]); }
       }).catch(() => { setLoadError(true); toast.error('Failed to load profile'); });
   };
@@ -183,7 +193,7 @@ export default function StudentProfile() {
     </StudentLayout>
   );
 
-  const avatarSrc = profile.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
   const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase();
 
   return (
@@ -230,8 +240,8 @@ export default function StudentProfile() {
               width: '36px', height: '36px', borderRadius: '50%',
               color: '#fff', cursor: 'pointer',
             }}>
-              <Camera size={16} />
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleCoverChange} />
+              {uploadingCover ? '…' : <Camera size={16} />}
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleCoverChange} disabled={uploadingCover} />
             </label>
           </div>
 
@@ -440,8 +450,8 @@ export default function StudentProfile() {
                   <FileText size={14} style={{ color: c.green }} />
                   <span style={{ fontSize: '12px', color: c.txt2, fontWeight: '500' }}>Current resume</span>
                 </div>
-                <a href={`${API_BASE_URL}/${profile.resumeUrl}`} target="_blank" rel="noreferrer"
-                  onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${profile.resumeUrl}`, 'My Resume'); } }}
+                <a href={resolveFileUrl(profile.resumeUrl)} target="_blank" rel="noreferrer"
+                  onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(profile.resumeUrl), 'My Resume'); } }}
                   style={{ fontSize: '12px', color: c.green, fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   Preview PDF →
                 </a>

@@ -3,17 +3,17 @@ import { MapPin, ArrowRight, Tag, DollarSign, Briefcase } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import api, { API_BASE_URL } from '../api/axios';
+import api, { resolveFileUrl } from '../api/axios';
 import JobDetailModal from './JobDetailModal';
 import toast from 'react-hot-toast';
 
 // ─── Individual slider card ───────────────────────────────────────────────────
 function SliderCard({ job, applied, saved, onClick, c }) {
   const logoSrc = job.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${job.Company.profileImageUrl}`
+    ? resolveFileUrl(job.Company.profileImageUrl)
     : null;
   const coverSrc = job.listingImageUrl
-    ? `${API_BASE_URL}/${job.listingImageUrl}`
+    ? resolveFileUrl(job.listingImageUrl)
     : logoSrc;
 
   return (

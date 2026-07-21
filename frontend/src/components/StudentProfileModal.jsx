@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { X, GraduationCap, Code2, ExternalLink, Globe, Phone, FileText, Mail } from 'lucide-react';
-import api, { API_BASE_URL } from '../api/axios';
+import api, { resolveFileUrl } from '../api/axios';
 import { usePdfViewer } from '../hooks/usePdfViewer';
 import PdfViewerModal from './PdfViewerModal';
 
@@ -18,7 +18,7 @@ export default function StudentProfileModal({ studentId, studentName, resumeSnap
       .finally(() => setLoading(false));
   }, [studentId]);
 
-  const avatarSrc = profile?.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile?.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
   const initials = profile
     ? `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase()
     : (studentName || 'S')[0].toUpperCase();
@@ -120,12 +120,12 @@ export default function StudentProfileModal({ studentId, studentName, resumeSnap
                 <div>
                   <p className="section-label" style={{ marginBottom: '6px' }}>Resume</p>
                   <a
-                    href={`${API_BASE_URL}/${resumeSnapshot || profile.resumeUrl}`}
+                    href={resolveFileUrl(resumeSnapshot || profile.resumeUrl)}
                     target="_blank" rel="noreferrer"
                     onClick={e => {
                       if (window.innerWidth <= 768) {
                         e.preventDefault();
-                        openPdf(`${API_BASE_URL}/${resumeSnapshot || profile.resumeUrl}`, `${studentName || 'Student'} — Resume`);
+                        openPdf(resolveFileUrl(resumeSnapshot || profile.resumeUrl), `${studentName || 'Student'} — Resume`);
                       }
                     }}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: c.green, fontWeight: '600', padding: '8px 14px', border: `1px solid rgba(26,127,90,0.3)`, background: 'rgba(26,127,90,0.07)', textDecoration: 'none' }}>

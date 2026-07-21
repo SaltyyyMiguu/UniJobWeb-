@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import CompanyLayout from '../../components/layouts/CompanyLayout';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -76,7 +76,7 @@ function JobForm({ initial = EMPTY_FORM, onSave, onCancel, saving, label, c }) {
 /* ─── Grid card ─── */
 function JobCard({ job, c, avatarSrc, avatarLetter, onEdit, onUploadImage, onViewApplicants, applicantCount }) {
   const isActive = job.isActive !== false;
-  const listingImgSrc = job.listingImageUrl ? `${API_BASE_URL}/${job.listingImageUrl}` : null;
+  const listingImgSrc = job.listingImageUrl ? resolveFileUrl(job.listingImageUrl) : null;
   const imgInputRef = useRef(null);
 
   const handleImagePick = (e) => {
@@ -161,7 +161,7 @@ export default function CompanyManageJobs() {
   const [viewingApplicantsJob, setViewingApplicantsJob] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null); // { type: 'archive'|'delete', jobId }
 
-  const avatarSrc = profile?.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile?.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
   const avatarLetter = profile?.companyName?.[0]?.toUpperCase() || 'C';
 
   const fetchJobs = () => {

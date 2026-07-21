@@ -37,6 +37,16 @@ export const removeToken = () => {
 // api.get/post call.
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Uploaded files (avatars, resumes, offer letters, cover/listing images) now
+// live on Cloudinary and come back from the API as absolute URLs. Older rows
+// created before that migration can still hold a relative local path
+// (e.g. "uploads/profiles/xyz.jpg"), so only prefix with the API origin when
+// the value isn't already a full URL.
+export const resolveFileUrl = (url) => {
+  if (!url) return null;
+  return /^https?:\/\//i.test(url) ? url : `${API_BASE_URL}/${url}`;
+};
+
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
 });

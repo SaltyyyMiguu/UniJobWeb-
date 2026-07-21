@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Trophy, PartyPopper } from 'lucide-react';
-import { API_BASE_URL } from '../api/axios';
+import { resolveFileUrl } from '../api/axios';
 
 const CONFETTI_COLORS = ['#C41E3A', '#FBB839', '#34D399', '#1D4ED8', '#E05070', '#F0F0EE'];
 
@@ -39,7 +39,7 @@ export default function HiredCelebration({ application, onClose }) {
   const companyName = application?.JobPosting?.Company?.companyName || 'the company';
   const jobTitle = application?.JobPosting?.title || 'the role';
   const logoSrc = application?.JobPosting?.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${application.JobPosting.Company.profileImageUrl}`
+    ? resolveFileUrl(application.JobPosting.Company.profileImageUrl)
     : null;
 
   return (

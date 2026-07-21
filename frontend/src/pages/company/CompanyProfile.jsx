@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import CompanyLayout from '../../components/layouts/CompanyLayout';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -26,14 +26,23 @@ export default function CompanyProfile() {
   const [deactivating, setDeactivating] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop');
+  const DEFAULT_COVER = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop';
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState(DEFAULT_COVER);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
-  // Client-side preview only (URL.createObjectURL) — nothing is uploaded to the
-  // server, so this resets to the placeholder above on refresh until a real
-  // cover-photo upload endpoint exists.
-  const handleCoverChange = (e) => {
+  const handleCoverChange = async (e) => {
     const file = e.target.files[0];
-    if (file) setCoverPhotoUrl(URL.createObjectURL(file));
+    if (!file) return;
+    const fd = new FormData(); fd.append('coverPhoto', file);
+    setUploadingCover(true);
+    try {
+      const r = await api.post('/users/cover-photo', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCoverPhotoUrl(resolveFileUrl(r.data.coverPhotoUrl));
+      toast.success('Cover photo updated!');
+    } catch { toast.error('Cover photo upload failed.'); }
+    setUploadingCover(false);
   };
 
   const handleChangePassword = async (e) => {
@@ -65,7 +74,11 @@ export default function CompanyProfile() {
   const loadProfile = () => {
     setLoadError(false);
     api.get('/company/profile')
-      .then(r => { setProfile(r.data); setForm(r.data); })
+      .then(r => {
+        setProfile(r.data);
+        setForm(r.data);
+        setCoverPhotoUrl(r.data.coverPhotoUrl ? resolveFileUrl(r.data.coverPhotoUrl) : DEFAULT_COVER);
+      })
       .catch(() => { setLoadError(true); toast.error('Failed to load profile'); });
   };
 
@@ -108,7 +121,7 @@ export default function CompanyProfile() {
   }
   if (!profile) return <CompanyLayout><div style={{ padding: '60px', textAlign: 'center', color: 'var(--txt-3)', fontSize: '13px' }}>Loading…</div></CompanyLayout>;
 
-  const avatarSrc = profile.profileImageUrl ? `${API_BASE_URL}/${profile.profileImageUrl}` : null;
+  const avatarSrc = profile.profileImageUrl ? resolveFileUrl(profile.profileImageUrl) : null;
   const avatarLetter = profile.companyName?.[0]?.toUpperCase() || 'C';
 
   return (
@@ -152,8 +165,8 @@ export default function CompanyProfile() {
               width: '36px', height: '36px', borderRadius: '50%',
               color: '#fff', cursor: 'pointer',
             }}>
-              <Camera size={16} />
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleCoverChange} />
+              {uploadingCover ? '…' : <Camera size={16} />}
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleCoverChange} disabled={uploadingCover} />
             </label>
           </div>
           <div className="mobile-profile-header" style={{ padding: '0 24px 20px', position: 'relative' }}>

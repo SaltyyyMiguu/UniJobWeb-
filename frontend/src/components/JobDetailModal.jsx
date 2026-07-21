@@ -1,7 +1,7 @@
 import { X, MapPin, Tag, Clock, DollarSign, Users, Calendar, Briefcase, Send, Building2, Globe, CheckCircle, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../api/axios';
+import { resolveFileUrl } from '../api/axios';
 
 function Section({ title, content, c }) {
   if (!content) return null;
@@ -37,7 +37,7 @@ export default function JobDetailModal({ job, onClose, onApply, isApplying, alre
   const canApply = isStudent && job.isActive !== false;
 
   const logoSrc = job.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${job.Company.profileImageUrl}`
+    ? resolveFileUrl(job.Company.profileImageUrl)
     : null;
 
   const infoItems = [

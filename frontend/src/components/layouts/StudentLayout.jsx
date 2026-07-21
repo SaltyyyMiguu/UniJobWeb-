@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, ClipboardList, MessageSquare,
   User
 } from 'lucide-react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import ThemeToggle from '../ThemeToggle';
 import logo from '../../assets/logo.webp';
 
@@ -35,7 +35,7 @@ export default function StudentLayout({ children }) {
 
   const avatarLetter = profile?.firstName?.[0]?.toUpperCase() || 'S';
   const avatarSrc = profile?.profileImageUrl
-    ? `${API_BASE_URL}/${profile.profileImageUrl}`
+    ? resolveFileUrl(profile.profileImageUrl)
     : null;
 
   const Sidebar = () => (

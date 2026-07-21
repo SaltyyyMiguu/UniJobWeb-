@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cron = require('node-cron');
@@ -47,40 +46,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// ─── Static file serving with caching headers ──────────────────────────────
-// Public assets: logos, listing covers — encourage browser caching (1 day)
-app.use('/uploads/profiles', express.static(path.join(__dirname, 'uploads/profiles'), {
-  maxAge: '1d',
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-  }
-}));
-app.use('/uploads/listings', express.static(path.join(__dirname, 'uploads/listings'), {
-  maxAge: '1d',
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-  }
-}));
-
-// Sensitive documents: resumes and offer letters — NEVER cache
-app.use('/uploads/resumes', express.static(path.join(__dirname, 'uploads/resumes'), {
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
-app.use('/uploads/offers', express.static(path.join(__dirname, 'uploads/offers'), {
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
-
-// Fallback static for any remaining /uploads paths
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── API Routes ────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.json({ message: 'Welcome to UniJobLink API' }));
@@ -210,11 +175,6 @@ sequelize.authenticate()
     console.log('Database synchronized.');
     // Run legacy job cleanup
     await cleanupLegacyJobs();
-    // Ensure upload directories exist
-    const fs = require('fs');
-    ['uploads/resumes', 'uploads/profiles', 'uploads/listings', 'uploads/offers'].forEach(dir => {
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    });
   })
   .catch(err => console.error('Database error:', err));
 

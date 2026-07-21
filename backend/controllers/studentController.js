@@ -1,47 +1,8 @@
 const { Op } = require('sequelize');
-const multer = require('multer');
-const path = require('path');
 const { Student, Application, JobPosting, Company, User, ChatRoom, Message, Supervisor, sequelize } = require('../models');
 const cache = require('../utils/cache');
 const { sendCompanyEmail, sendSupervisorEmail } = require('../utils/mailer');
-
-// ─── Multer: resume uploads ───────────────────────────────────────────────────
-// Extension is hardcoded to .pdf regardless of the client-supplied originalname —
-// never trust an attacker-controlled filename for the extension that express.static
-// will use to infer Content-Type when serving the stored file.
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/resumes/'),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'resume-' + uniqueSuffix + '.pdf');
-  }
-});
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (file.mimetype === 'application/pdf' && ext === '.pdf') cb(null, true);
-    else cb(new Error('Only PDF files are allowed'), false);
-  },
-  limits: { fileSize: 5 * 1024 * 1024 }
-});
-
-// ─── Multer: profile image ────────────────────────────────────────────────────
-const profileImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/profiles/'),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-const uploadProfileImageMulter = multer({
-  storage: profileImageStorage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Only image files are allowed'), false);
-  },
-  limits: { fileSize: 3 * 1024 * 1024 }
-});
+const { uploadResume: upload, uploadStudentProfileImage: uploadProfileImageMulter } = require('../utils/cloudinaryUploader');
 
 // ─── GET /api/student/profile ─────────────────────────────────────────────────
 const getProfile = async (req, res) => {
@@ -110,7 +71,7 @@ const uploadResume = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { userId: req.user.id } });
     if (!student) return res.status(404).json({ message: 'Student profile not found.' });
-    student.resumeUrl = req.file.path.replace(/\\/g, '/');
+    student.resumeUrl = req.file.path;
     await student.save();
     res.json({ message: 'Resume uploaded successfully.', resumeUrl: student.resumeUrl });
   } catch (error) {
@@ -124,7 +85,7 @@ const uploadProfileImage = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { userId: req.user.id } });
     if (!student) return res.status(404).json({ message: 'Student profile not found.' });
-    student.profileImageUrl = req.file.path.replace(/\\/g, '/');
+    student.profileImageUrl = req.file.path;
     await student.save();
     res.json({ message: 'Profile image uploaded.', profileImageUrl: student.profileImageUrl });
   } catch (error) {

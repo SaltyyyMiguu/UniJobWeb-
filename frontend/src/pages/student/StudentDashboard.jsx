@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api, { API_BASE_URL } from '../../api/axios';
+import api, { resolveFileUrl } from '../../api/axios';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import FeaturedJobsSlider from '../../components/FeaturedJobsSlider';
 import { useAuth } from '../../context/AuthContext';
@@ -18,7 +18,7 @@ import PdfViewerModal from '../../components/PdfViewerModal';
 
 function RecommendedCard({ job, onView, c }) {
   const logoSrc = job.Company?.profileImageUrl
-    ? `${API_BASE_URL}/${job.Company.profileImageUrl}`
+    ? resolveFileUrl(job.Company.profileImageUrl)
     : null;
   return (
     <div
@@ -168,9 +168,9 @@ export default function StudentDashboard() {
               <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                 {app.offerLetterUrl && (
                   <a
-                    href={`${API_BASE_URL}/${app.offerLetterUrl}`}
+                    href={resolveFileUrl(app.offerLetterUrl)}
                     target="_blank" rel="noreferrer"
-                    onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(`${API_BASE_URL}/${app.offerLetterUrl}`, `Offer Letter — ${app.JobPosting?.title || ''}`); } }}
+                    onClick={e => { if (window.innerWidth <= 768) { e.preventDefault(); openPdf(resolveFileUrl(app.offerLetterUrl), `Offer Letter — ${app.JobPosting?.title || ''}`); } }}
                     className="btn btn-sm"
                     style={{ background: c.green, color: '#fff', border: 'none', textDecoration: 'none' }}>
                     <FileText size={12} /> View Offer Letter

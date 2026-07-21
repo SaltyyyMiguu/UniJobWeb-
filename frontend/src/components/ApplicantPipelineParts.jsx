@@ -8,7 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import { usePdfViewer } from '../hooks/usePdfViewer';
 import PdfViewerModal from './PdfViewerModal';
-import { API_BASE_URL } from '../api/axios';
+import { resolveFileUrl } from '../api/axios';
 
 // Pipeline stages: which actions are available from each status
 export const PIPELINE = {
@@ -166,7 +166,7 @@ export function ApplicantCard({ app, onAction, onViewStudent, onSetSlots, updati
   const isUpdating = updating === app.id;
 
   const initial = `${app.Student?.firstName?.[0] || ''}${app.Student?.lastName?.[0] || ''}`.toUpperCase();
-  const avatarSrc = app.Student?.profileImageUrl ? `${API_BASE_URL}/${app.Student.profileImageUrl}` : null;
+  const avatarSrc = app.Student?.profileImageUrl ? resolveFileUrl(app.Student.profileImageUrl) : null;
   const pipeline = PIPELINE[app.status] || PIPELINE.PENDING;
 
   const handleAction = (status, extraData = {}) => {
@@ -317,14 +317,14 @@ export function ApplicantCard({ app, onAction, onViewStudent, onSetSlots, updati
         {((app.resumeSnapshot || app.Student?.resumeUrl) || pipeline.next.length > 0) && (
           <div className="applicant-card-actions" style={{ padding: '10px 16px', borderTop: `1px solid ${c.border}`, background: c.surface2, display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {(app.resumeSnapshot || app.Student?.resumeUrl) && (
-              <a href={`${API_BASE_URL}/${app.resumeSnapshot || app.Student.resumeUrl}`}
+              <a href={resolveFileUrl(app.resumeSnapshot || app.Student.resumeUrl)}
                 target="_blank" rel="noreferrer"
                 style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', color: c.green, fontWeight: '600', padding: '6px 12px', border: `1px solid rgba(26,127,90,0.3)`, background: 'rgba(26,127,90,0.07)' }}
                 onClick={e => {
                   e.stopPropagation();
                   if (window.innerWidth <= 768) {
                     e.preventDefault();
-                    openPdf(`${API_BASE_URL}/${app.resumeSnapshot || app.Student.resumeUrl}`, `${app.Student?.firstName} ${app.Student?.lastName} — Resume`);
+                    openPdf(resolveFileUrl(app.resumeSnapshot || app.Student.resumeUrl), `${app.Student?.firstName} ${app.Student?.lastName} — Resume`);
                   }
                 }}>
                 <FileText size={12} />View Resume PDF
@@ -377,7 +377,7 @@ export function ApplicantCard({ app, onAction, onViewStudent, onSetSlots, updati
 export function ClosedApplicantCard({ app, onViewStudent, c }) {
   const pipeline = PIPELINE[app.status] || PIPELINE.REJECTED;
   const initial = `${app.Student?.firstName?.[0] || ''}${app.Student?.lastName?.[0] || ''}`.toUpperCase();
-  const avatarSrc = app.Student?.profileImageUrl ? `${API_BASE_URL}/${app.Student.profileImageUrl}` : null;
+  const avatarSrc = app.Student?.profileImageUrl ? resolveFileUrl(app.Student.profileImageUrl) : null;
   const hasResume = app.resumeSnapshot || app.Student?.resumeUrl;
   const { viewerUrl, viewerTitle, openPdf, closePdf } = usePdfViewer();
 
@@ -427,28 +427,28 @@ export function ClosedApplicantCard({ app, onViewStudent, c }) {
       {(hasResume || app.offerLetterUrl) && (
         <div className="applicant-card-actions" style={{ padding: '10px 16px', borderTop: `1px solid ${c.border}`, background: c.surface2, display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {hasResume && (
-            <a href={`${API_BASE_URL}/${app.resumeSnapshot || app.Student.resumeUrl}`}
+            <a href={resolveFileUrl(app.resumeSnapshot || app.Student.resumeUrl)}
               target="_blank" rel="noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', color: c.green, fontWeight: '600', padding: '6px 12px', border: `1px solid rgba(26,127,90,0.3)`, background: 'rgba(26,127,90,0.07)' }}
               onClick={e => {
                 e.stopPropagation();
                 if (window.innerWidth <= 768) {
                   e.preventDefault();
-                  openPdf(`${API_BASE_URL}/${app.resumeSnapshot || app.Student.resumeUrl}`, `${app.Student?.firstName} ${app.Student?.lastName} — Resume`);
+                  openPdf(resolveFileUrl(app.resumeSnapshot || app.Student.resumeUrl), `${app.Student?.firstName} ${app.Student?.lastName} — Resume`);
                 }
               }}>
               <FileText size={12} />View Resume PDF
             </a>
           )}
           {app.offerLetterUrl && (
-            <a href={`${API_BASE_URL}/${app.offerLetterUrl}`}
+            <a href={resolveFileUrl(app.offerLetterUrl)}
               target="_blank" rel="noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', color: '#1D4ED8', fontWeight: '600', padding: '6px 12px', border: '1px solid rgba(29,78,216,0.3)', background: 'rgba(29,78,216,0.07)' }}
               onClick={e => {
                 e.stopPropagation();
                 if (window.innerWidth <= 768) {
                   e.preventDefault();
-                  openPdf(`${API_BASE_URL}/${app.offerLetterUrl}`, `${app.Student?.firstName} ${app.Student?.lastName} — Offer Letter`);
+                  openPdf(resolveFileUrl(app.offerLetterUrl), `${app.Student?.firstName} ${app.Student?.lastName} — Offer Letter`);
                 }
               }}>
               <FileText size={12} />View Offer Letter
