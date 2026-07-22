@@ -593,8 +593,13 @@ html, body, #root {
 
   /* ─────────────────────────────────────────────────────────────────────────
      2. Touch targets — Material Design 48px minimum
+     Excludes checkbox/radio inputs — forcing them to width:100%/min-height:48px
+     blows them up to fill their row (verified: a checkbox styled w-5 h-5 was
+     computing to 304px × 48px here, stealing nearly all the row's flex space
+     from its label text). Checkboxes/radios should stay their native small
+     square size; their own className (e.g. w-5 h-5) controls sizing instead.
      ───────────────────────────────────────────────────────────────────────── */
-  input, select, textarea {
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
     font-size: 16px !important; /* prevents iOS auto-zoom on focus */
     padding: 12px 14px !important;
     min-height: 48px !important;
