@@ -123,10 +123,15 @@ export default function AdminEditUserModal({ user, role, onClose, onSaved }) {
                     Couldn't load the supervisor list — this dropdown may be incomplete. Try closing and reopening this modal.
                   </p>
                 )}
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', fontSize: '12px', color: c.txt2, cursor: form.supervisorId ? 'pointer' : 'not-allowed', opacity: form.supervisorId ? 1 : 0.5 }}>
+                <label
+                  className="flex items-start gap-3"
+                  style={{ marginTop: '10px', cursor: form.supervisorId ? 'pointer' : 'not-allowed', opacity: form.supervisorId ? 1 : 0.5 }}>
                   <input type="checkbox" checked={forceApprove} disabled={!form.supervisorId}
-                    onChange={e => setForceApprove(e.target.checked)} />
-                  Force approve this assignment (bypasses supervisor confirmation)
+                    onChange={e => setForceApprove(e.target.checked)}
+                    className="w-5 h-5 flex-shrink-0 mt-1" />
+                  <span className="flex-1 text-sm text-gray-600">
+                    Force approve this assignment (bypasses supervisor confirmation)
+                  </span>
                 </label>
               </div>
             </>
