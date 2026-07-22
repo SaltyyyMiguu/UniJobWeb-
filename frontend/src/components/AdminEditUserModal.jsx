@@ -15,6 +15,25 @@ export default function AdminEditUserModal({ user, role, onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [supervisorLoadFailed, setSupervisorLoadFailed] = useState(false);
 
+  // iOS Safari can visually shift a position:fixed element relative to the
+  // underlying page's scroll state when it's inserted — locking the body to
+  // its current scroll position while the modal is open (and restoring it on
+  // close) keeps the fixed overlay pinned to a clean, unscrolled viewport.
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    const { style } = document.body;
+    const prev = { position: style.position, top: style.top, width: style.width };
+    style.position = 'fixed';
+    style.top = `-${scrollY}px`;
+    style.width = '100%';
+    return () => {
+      style.position = prev.position;
+      style.top = prev.top;
+      style.width = prev.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   useEffect(() => {
     if (role === 'student') {
       setForm({
