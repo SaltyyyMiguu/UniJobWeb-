@@ -9,9 +9,18 @@
  * can never delay or break a database transaction or API response.
  */
 const nodemailer = require('nodemailer');
+const path = require('path');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 587;
+
+// Embedded via CID rather than a public URL — most mail clients block/proxy
+// remote images by default (so the logo wouldn't reliably show), and Gmail
+// specifically strips <img src> pointing at a non-HTTPS/unreachable host.
+// PNG (not the app's usual .webp) for universal email-client support —
+// older Outlook builds don't render WebP at all.
+const LOGO_PATH = path.join(__dirname, '../assets/logo.png');
+const LOGO_CID = 'unijoblogo';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -33,7 +42,7 @@ function wrapTemplate({ heading, body, ctaLink = `${FRONTEND_URL}/login`, ctaLab
   return `
   <div style="font-family: Arial, Helvetica, sans-serif; max-width: 480px; margin: 0 auto; background: #F7F7F5; padding: 32px 24px;">
     <div style="background: #1A2235; padding: 20px 24px; display: flex; align-items: center; gap: 10px;">
-      <span style="display:inline-block; width: 28px; height: 28px; background: #C41E3A; color: #fff; font-weight: 900; font-size: 13px; text-align: center; line-height: 28px;">U</span>
+      <img src="cid:${LOGO_CID}" alt="UniJobLink Logo" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain; border-radius: 6px; display: block;" />
       <span style="color: #fff; font-weight: 700; font-size: 15px;">UniJobLink</span>
     </div>
     <div style="background: #ffffff; border: 1px solid #E5E5E3; border-top: none; padding: 28px 24px;">
@@ -60,6 +69,11 @@ async function dispatch(to, subject, html) {
     await transporter.sendMail({
       from: senderAddress ? `"UniJobLink" <${senderAddress}>` : 'UniJobLink <no-reply@unijoblink.local>',
       to, subject, html,
+      attachments: [{
+        filename: 'logo.png',
+        path: LOGO_PATH,
+        cid: LOGO_CID,
+      }],
     });
   } catch (error) {
     // Per directive: never let a mail failure break the caller's flow.
