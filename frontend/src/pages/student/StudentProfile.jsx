@@ -9,6 +9,33 @@ import { useNavigate } from 'react-router-dom';
 import { usePdfViewer } from '../../hooks/usePdfViewer';
 import PdfViewerModal from '../../components/PdfViewerModal';
 
+// Faculty -> degree programme options, for the cascading dropdowns below.
+// Programme names match the flat list on StudentRegisterPage.jsx exactly, so
+// existing students' saved values still line up with an option here.
+const FACULTY_PROGRAMS = {
+  'Faculty of Computing and Information Technology': [
+    'Bachelor of Computer Science (Hons)',
+    'Bachelor of Information Technology (Hons)',
+    'Bachelor of Software Engineering (Hons)',
+    'Bachelor of Data Science (Hons)',
+    'Bachelor of Cybersecurity (Hons)',
+    'Bachelor of Artificial Intelligence (Hons)',
+  ],
+  'Faculty of Engineering': [
+    'Bachelor of Engineering - Electrical (Hons)',
+    'Bachelor of Engineering - Mechanical (Hons)',
+  ],
+  'Faculty of Business and Management': [
+    'Bachelor of Business Administration (Hons)',
+    'Bachelor of Accounting (Hons)',
+  ],
+  'Faculty of Applied Sciences': [
+    'Bachelor of Biomedical Science (Hons)',
+    'Bachelor of Pharmacy (Hons)',
+  ],
+  'Other': ['Other'],
+};
+
 function SkillTag({ skill, onRemove, editable }) {
   return (
     <span style={{
@@ -304,13 +331,28 @@ export default function StudentProfile() {
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 {[
                   { key: 'firstName', label: 'First Name' }, { key: 'lastName', label: 'Last Name' },
-                  { key: 'faculty', label: 'Faculty' }, { key: 'degreeProgram', label: 'Degree Programme' },
                 ].map(({ key, label }) => (
                   <div key={key}>
                     <label className="input-label">{label}</label>
                     <input className="input" value={form[key] || ''} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
                   </div>
                 ))}
+                <div>
+                  <label className="input-label">Faculty</label>
+                  <select className="input" value={form.faculty || ''}
+                    onChange={e => setForm(f => ({ ...f, faculty: e.target.value, degreeProgram: '' }))}>
+                    <option value="" disabled>Select your Faculty</option>
+                    {Object.keys(FACULTY_PROGRAMS).map(fac => <option key={fac} value={fac}>{fac}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="input-label">Degree Programme</label>
+                  <select className="input" value={form.degreeProgram || ''} disabled={!form.faculty}
+                    onChange={e => setForm(f => ({ ...f, degreeProgram: e.target.value }))}>
+                    <option value="" disabled>{form.faculty ? 'Select your Degree Programme' : 'Select a Faculty first'}</option>
+                    {(FACULTY_PROGRAMS[form.faculty] || []).map(prog => <option key={prog} value={prog}>{prog}</option>)}
+                  </select>
+                </div>
               </div>
             ) : (
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
