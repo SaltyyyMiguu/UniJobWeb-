@@ -5,6 +5,14 @@ import EmailOtpField from '../components/EmailOtpField';
 import toast from 'react-hot-toast';
 import logo from '../assets/logo.webp';
 
+const TITLES = ['Lecturer', 'Senior Lecturer', 'Assistant Professor', 'Associate Professor', 'Professor'];
+const DEPARTMENTS = [
+  'Department of Computer Science',
+  'Department of Information Technology',
+  'Department of Engineering',
+  'Department of Business and Management',
+];
+
 export default function SupervisorRegisterPage() {
   const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', department: '', title: '' });
   const [loading, setLoading] = useState(false);
@@ -102,14 +110,20 @@ export default function SupervisorRegisterPage() {
 
             <div>
               <label className="input-label">Title</label>
-              <input className="input auth-mobile-input" id="supervisor-title" name="title" placeholder="e.g. Senior Lecturer"
-                value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              <select className="input auth-mobile-input" id="supervisor-title" name="title"
+                value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}>
+                <option value="" disabled>Select Title</option>
+                {TITLES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
             </div>
 
             <div>
               <label className="input-label">Department</label>
-              <input className="input auth-mobile-input" id="supervisor-department" name="department" placeholder="e.g. Department of Computer Science"
-                value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} />
+              <select className="input auth-mobile-input" id="supervisor-department" name="department"
+                value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))}>
+                <option value="" disabled>Select Department</option>
+                {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
             </div>
 
             <EmailOtpField
