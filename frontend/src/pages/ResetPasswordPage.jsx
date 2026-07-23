@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import logo from '../assets/logo.webp';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ token: '', newPassword: '', confirmPassword: '' });
+  const [searchParams] = useSearchParams();
+  // Lazy initial state — read once on mount rather than via useEffect, so
+  // the field is already filled on first render instead of flashing empty.
+  const [tokenFromUrl] = useState(() => searchParams.get('token') || '');
+  const [form, setForm] = useState({ token: tokenFromUrl, newPassword: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -35,19 +39,25 @@ export default function ResetPasswordPage() {
           Reset Password
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--txt-3, #999)', margin: '0 0 28px' }}>
-          Enter your reset token and choose a new password.
+          {tokenFromUrl ? 'Choose a new password to finish resetting your account.' : 'Enter your reset token and choose a new password.'}
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label className="input-label">Reset Token</label>
-            <input
-              className="input" type="text" required
-              value={form.token} onChange={e => setForm(f => ({ ...f, token: e.target.value }))}
-              placeholder="Paste your reset token here"
-              style={{ fontFamily: 'monospace' }}
-            />
-          </div>
+          {tokenFromUrl ? (
+            <p style={{ fontSize: '12px', color: '#1A7F5A', background: 'rgba(26,127,90,0.08)', border: '1px solid rgba(26,127,90,0.25)', padding: '10px 12px', margin: 0 }}>
+              ✓ Reset token detected from your email link.
+            </p>
+          ) : (
+            <div>
+              <label className="input-label">Reset Token</label>
+              <input
+                className="input" type="text" required
+                value={form.token} onChange={e => setForm(f => ({ ...f, token: e.target.value }))}
+                placeholder="Paste your reset token here"
+                style={{ fontFamily: 'monospace' }}
+              />
+            </div>
+          )}
           <div>
             <label className="input-label">New Password</label>
             <input
