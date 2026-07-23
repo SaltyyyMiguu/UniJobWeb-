@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { sequelize, Company, User, Student, Application, JobPosting, Supervisor } = require('../models');
+const { sendAccountStatusEmail } = require('../utils/mailer');
+const { auditLog } = require('../utils/auditLogger');
 
 // ─── GET /api/admin/companies/pending ────────────────────────────────────────
 const getPendingCompanies = async (req, res) => {
@@ -220,6 +222,17 @@ const toggleUserArchive = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found.' });
     user.isArchived = !user.isArchived;
     await user.save();
+
+    if (user.isArchived) {
+      auditLog(`User Deactivated - User ID: ${user.id} - Role: ${user.role} - By Admin (User ID): ${req.user.id}`);
+      // Fired without awaiting — a slow/dead SMTP server can never delay or
+      // break this response (mailer.js also catches internally as defense-in-depth).
+      sendAccountStatusEmail(user.email, 'DEACTIVATED')
+        .catch(err => console.error('[email] sendAccountStatusEmail(DEACTIVATED) failed:', err.message));
+    } else {
+      auditLog(`User Reactivated - User ID: ${user.id} - Role: ${user.role} - By Admin (User ID): ${req.user.id}`);
+    }
+
     res.json({ message: user.isArchived ? 'User deactivated.' : 'User reactivated.', user });
   } catch (error) {
     console.error('[Failed to update user.] DB error:', error);

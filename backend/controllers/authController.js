@@ -193,7 +193,7 @@ const login = async (req, res) => {
     // Soft-delete check
     if (user.isArchived) {
       auditLog(`Login Failed - Email: ${email} - Reason: Account Deactivated`);
-      return res.status(403).json({ message: 'This account has been deactivated. Please contact the admin.' });
+      return res.status(403).json({ success: false, message: 'Your account has been deactivated. Please contact the administrator.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

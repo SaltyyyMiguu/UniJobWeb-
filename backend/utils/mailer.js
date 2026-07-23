@@ -150,6 +150,23 @@ async function sendSupervisorEmail(email, supervisorName, studentName, companyNa
   return dispatch(email, t.subject, html);
 }
 
+// ─── Account status notifications ─────────────────────────────────────────────
+// type: 'DEACTIVATED' — role-agnostic (student/company/supervisor all share
+// this), fired from adminController.js's toggleUserArchive.
+async function sendAccountStatusEmail(email, type) {
+  const templates = {
+    DEACTIVATED: {
+      subject: 'Your UniJobLink account has been deactivated',
+      heading: 'Account deactivated',
+      body: 'Your UniJobLink account has been deactivated by an administrator. If you believe this was a mistake or have any questions, please contact the UCSI University administration team for assistance.',
+    },
+  };
+  const t = templates[type];
+  if (!t) { console.error(`[mailer] Unknown account status email type: ${type}`); return; }
+  const html = wrapTemplate({ heading: t.heading, body: t.body });
+  return dispatch(email, t.subject, html);
+}
+
 // ─── Pre-registration OTP ─────────────────────────────────────────────────────
 async function sendOtpEmail(email, otp) {
   const html = wrapTemplate({
@@ -161,4 +178,4 @@ async function sendOtpEmail(email, otp) {
   return dispatch(email, 'Your UniJobLink verification code', html);
 }
 
-module.exports = { sendStudentEmail, sendCompanyEmail, sendSupervisorEmail, sendOtpEmail };
+module.exports = { sendStudentEmail, sendCompanyEmail, sendSupervisorEmail, sendAccountStatusEmail, sendOtpEmail };
