@@ -7,15 +7,15 @@ import logo from '../assets/logo.webp';
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null); // { resetToken, expiresAt }
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post('/auth/forgot-password', { email });
-      setResult(res.data);
-      toast.success('Reset token generated!');
+      await api.post('/auth/forgot-password', { email });
+      setSubmitted(true);
+      toast.success('Reset email sent!');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Request failed.');
     } finally { setLoading(false); }
@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
           Enter your account email to receive a password reset token.
         </p>
 
-        {!result ? (
+        {!submitted ? (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label className="input-label">Email address</label>
@@ -48,21 +48,14 @@ export default function ForgotPasswordPage() {
             </div>
             <button type="submit" disabled={loading} className="btn btn-primary btn-lg"
               style={{ width: '100%', justifyContent: 'center' }}>
-              {loading ? 'Generating…' : 'Send Reset Token'}
+              {loading ? 'Sending…' : 'Send Reset Token'}
             </button>
           </form>
         ) : (
           <div>
             <div style={{ padding: '16px', background: 'rgba(26,127,90,0.08)', border: '1px solid rgba(26,127,90,0.25)', marginBottom: '20px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#1A7F5A', margin: '0 0 8px' }}>Reset Token Generated</p>
-              <p style={{ fontSize: '11px', color: 'var(--txt-2)', margin: '0 0 10px', lineHeight: '1.5' }}>
-                Copy this token and use it on the Reset Password page. It expires in 1 hour.
-              </p>
-              <div style={{ padding: '10px', background: 'var(--surface, #fff)', border: '1px solid var(--border)', fontFamily: 'monospace', fontSize: '12px', color: 'var(--txt-1)', wordBreak: 'break-all', userSelect: 'all' }}>
-                {result.resetToken}
-              </div>
-              <p style={{ fontSize: '11px', color: 'var(--txt-3)', margin: '8px 0 0' }}>
-                ⏰ Expires: {result.expiresAt ? new Date(result.expiresAt).toLocaleTimeString() : 'in 1 hour'}
+              <p style={{ fontSize: '13px', color: 'var(--txt-1)', margin: 0, lineHeight: '1.6' }}>
+                If an account matches that email, we have sent a reset token to your inbox. Please check your email and use it on the next page.
               </p>
             </div>
             <Link to="/reset-password" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center', textDecoration: 'none', display: 'flex' }}>

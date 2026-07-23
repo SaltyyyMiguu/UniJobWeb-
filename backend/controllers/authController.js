@@ -248,8 +248,9 @@ const changePassword = async (req, res) => {
 };
 
 // ─── POST /api/auth/forgot-password ──────────────────────────────────────────
-// Generates a reset token. In production this would be emailed; here it's
-// returned in the response for demonstration purposes.
+// Generates a reset token, emails it via mailer.js, and returns only a
+// generic success message — the raw token must never appear in the API
+// response or it'd let anyone with a user's email hijack their account.
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
