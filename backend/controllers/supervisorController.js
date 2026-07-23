@@ -148,8 +148,8 @@ const getStudentDetail = async (req, res) => {
       where: { studentId: student.id },
       include: [{
         model: JobPosting,
-        attributes: ['id', 'title', 'category', 'location', 'allowance', 'duration'],
-        include: [{ model: Company, attributes: ['id', 'companyName', 'profileImageUrl'] }],
+        attributes: ['id', 'title', 'category', 'location', 'allowance', 'duration', 'positionsLeft', 'description', 'requirements', 'benefits', 'isActive', 'createdAt'],
+        include: [{ model: Company, attributes: ['id', 'companyName', 'profileImageUrl', 'industry', 'website', 'isVerified'] }],
       }],
       order: [['createdAt', 'DESC']],
     });

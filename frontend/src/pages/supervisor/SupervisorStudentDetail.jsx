@@ -8,6 +8,7 @@ import { ArrowLeft, Briefcase, FileText, GraduationCap, Mail, Hash, ThumbsUp, Th
 import toast from 'react-hot-toast';
 import { usePdfViewer } from '../../hooks/usePdfViewer';
 import PdfViewerModal from '../../components/PdfViewerModal';
+import JobDetailModal from '../../components/JobDetailModal';
 
 function PlacementCard({ app, onApprove, onReject, acting, c }) {
   const pipeline = PIPELINE[app.status] || PIPELINE.PENDING;
@@ -15,12 +16,17 @@ function PlacementCard({ app, onApprove, onReject, acting, c }) {
     ? resolveFileUrl(app.JobPosting.Company.profileImageUrl)
     : null;
   const { viewerUrl, viewerTitle, openPdf, closePdf } = usePdfViewer();
+  const [showJobDetail, setShowJobDetail] = useState(false);
 
   return (
     <div className="card" style={{ padding: '16px 18px' }}>
       {viewerUrl && <PdfViewerModal url={viewerUrl} title={viewerTitle} onClose={closePdf} />}
+      {showJobDetail && <JobDetailModal job={app.JobPosting} onClose={() => setShowJobDetail(false)} />}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', minWidth: 0 }}>
+        <button
+          onClick={() => setShowJobDetail(true)}
+          className="hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+          style={{ display: 'flex', gap: '10px', alignItems: 'center', minWidth: 0, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}>
           <div style={{ width: '38px', height: '38px', flexShrink: 0, background: logoSrc ? 'transparent' : c.red, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             {logoSrc
               ? <img src={logoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -30,7 +36,7 @@ function PlacementCard({ app, onApprove, onReject, acting, c }) {
             <p style={{ fontSize: '14px', fontWeight: '700', color: c.txt1, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{app.JobPosting?.title}</p>
             <p style={{ fontSize: '12px', color: c.txt3, margin: '2px 0 0' }}>{app.JobPosting?.Company?.companyName}</p>
           </div>
-        </div>
+        </button>
         <span className={`badge ${pipeline.badgeClass}`} style={{ flexShrink: 0 }}>{pipeline.label}</span>
       </div>
 
