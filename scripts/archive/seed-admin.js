@@ -1,11 +1,11 @@
 /**
  * Admin Seed Script
- * Run this ONCE to create the admin account:
- *   node seed-admin.js
+ * Archived out of the production pipeline — run from the repo root:
+ *   node scripts/archive/seed-admin.js
  */
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../../backend/.env') });
 const bcrypt = require('bcryptjs');
-const { sequelize, User } = require('./models');
+const { sequelize, User } = require('../../backend/models');
 
 async function seed() {
   try {

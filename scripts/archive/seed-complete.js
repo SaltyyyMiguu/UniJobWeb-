@@ -7,14 +7,18 @@
  * - 8 students with resumes and profiles
  * - Sample applications
  *
- * Usage: node seed-complete.js
+ * Archived out of the production pipeline — run from the repo root:
+ *   node scripts/archive/seed-complete.js
+ * (Reads/writes uploads/ paths relative to CWD — run with CWD set to
+ * backend/ if you need those to land in backend/uploads/. See
+ * scripts/archive/README.md.)
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../../backend/.env') });
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
-const { sequelize, User, Student, Company, JobPosting, Application, ChatRoom } = require('./models');
+const { sequelize, User, Student, Company, JobPosting, Application, ChatRoom } = require('../../backend/models');
 
 async function seed() {
   try {

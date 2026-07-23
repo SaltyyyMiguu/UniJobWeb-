@@ -9,18 +9,18 @@
  * - Proper interview slots, offer letters, and confirmation data
  * - Students with complete profiles and diverse degree programs
  *
- * Usage:
- *   node seed-fresh.js
+ * Archived out of the production pipeline — run from the repo root:
+ *   node scripts/archive/seed-fresh.js
  *
  * Test Credentials:
  *   Students: <firstName>.<lastName>@ucsiuniversity.edu.my / Student@123
  *   Companies: (see COMPANIES array email/password)
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../../backend/.env') });
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const { sequelize, User, Student, Company, JobPosting, Application, ChatRoom, Message } = require('./models');
+const { sequelize, User, Student, Company, JobPosting, Application, ChatRoom, Message } = require('../../backend/models');
 
 const DEMO_PDF = `%PDF-1.4
 1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj

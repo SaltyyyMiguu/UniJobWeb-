@@ -3,14 +3,15 @@
  * category-themed cover images for job listings, using each company's
  * real brand colors. No internet access needed.
  *
- * Usage: node generate-images.js
+ * Archived out of the production pipeline — run from the repo root:
+ *   node scripts/archive/generate-images.js
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const PROFILES_DIR = path.join(__dirname, 'uploads/profiles');
-const LISTINGS_DIR = path.join(__dirname, 'uploads/listings');
+const PROFILES_DIR = path.join(__dirname, '../../backend/uploads/profiles');
+const LISTINGS_DIR = path.join(__dirname, '../../backend/uploads/listings');
 
 [PROFILES_DIR, LISTINGS_DIR].forEach(dir => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

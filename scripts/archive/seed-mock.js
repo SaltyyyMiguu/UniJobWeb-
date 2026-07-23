@@ -1,9 +1,12 @@
 /**
  * seed-mock.js — Full demo dataset for the UCSI Internship Portal
  *
- * Usage:
- *   node seed-mock.js           ← safe incremental seed (skips existing)
- *   node seed-mock.js --fresh   ← WIPES all non-admin data, then reseeds
+ * Archived out of the production pipeline — run from the repo root:
+ *   node scripts/archive/seed-mock.js           ← safe incremental seed (skips existing)
+ *   node scripts/archive/seed-mock.js --fresh   ← WIPES all non-admin data, then reseeds
+ * (Reads/writes uploads/ paths relative to CWD — run with CWD set to
+ * backend/ if you need those to land in backend/uploads/. See
+ * scripts/archive/README.md.)
  *
  * Credentials after seeding:
  *   Admin:   admin@ucsi.edu.my            / Admin@12345
@@ -33,11 +36,11 @@
  * actually emailed those companies.
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../../backend/.env') });
 const bcrypt = require('bcryptjs');
 const path   = require('path');
 const fs     = require('fs');
-const { sequelize, User, Student, Company, Supervisor, JobPosting, Application, ChatRoom, Message } = require('./models');
+const { sequelize, User, Student, Company, Supervisor, JobPosting, Application, ChatRoom, Message } = require('../../backend/models');
 
 const IS_FRESH = process.argv.includes('--fresh');
 
