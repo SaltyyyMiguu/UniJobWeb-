@@ -1,64 +1,63 @@
 # UniJobLink - UCSI Internship Management System
 
-This is the Final Year Project (FYP) repository for UniJobLink, a full-stack internship pipeline system designed to connect students, academic supervisors, and companies.
-
-## 🛠 Tech Stack
-*   **Frontend:** React, Tailwind CSS, Vercel
-*   **Backend:** Node.js, Express, Render
-*   **Database:** MySQL (Hosted on Aiven), `mysql2` driver
-*   **Storage:** Cloudinary (Images & PDF Resumes)
-*   **Email System:** Nodemailer (Custom HTML templates)
+UniJobLink is a full-stack web platform built for UCSI University to streamline the internship placement pipeline. It connects three core user roles: **Students**, **Academic Supervisors**, and **Corporate Employers**, facilitating everything from job applications to official offer extensions.
 
 ---
 
-## 🚀 Deployment & Hosting Quirks (Important!)
+## 🛠️ The Technology Stack
 
-### 1. Backend Sleep Prevention (Render)
-Render's free tier spins down the backend after 15 minutes of inactivity, which causes the Aiven database connection to drop. 
-*   **The Fix:** UptimeRobot is configured to ping the backend URL (`https://unijobweb.onrender.com`) every 5 minutes using an `HTTP(s)` monitor. This keeps the server permanently awake and the database connected.
+**Frontend (Client-Side)**
+*   **Framework:** React.js (via Vite)
+*   **Styling:** Tailwind CSS + Custom CSS Variables (for dual-theme support)
+*   **Design System:** Structural tokens based on Vercel's DESIGN.md (precision spacing, radius, and stacked shadows)
+*   **Hosting:** Vercel
 
-### 2. Database SSL Warning (Aiven + MySQL2)
-By default, Aiven appends `?ssl-mode=REQUIRED` to the database URL. The `mysql2` Node driver throws constant warning spam in the logs when it sees this.
-*   **The Fix:** The `?ssl-mode=REQUIRED` flag must be manually deleted from the `DATABASE_URL` string in the Render Environment Variables. SSL is hardcoded securely in `database.js` instead.
+**Backend (Server-Side)**
+*   **Environment:** Node.js with Express.js
+*   **Authentication:** JSON Web Tokens (JWT) & bcrypt for password hashing
+*   **Email Utility:** Nodemailer (Custom HTML transactional emails)
+*   **Hosting:** Render
 
----
-
-## 📁 Cloudinary Storage Configuration
-
-### PDF Resume Handling
-Cloudinary treats PDFs as `raw` files by default, which strips CORS headers and prevents browsers from rendering them in our custom UI.
-*   **The Fix:** PDFs are uploaded with `resource_type: 'image'` and `allowedFormats: ['pdf']`.
-*   **CRITICAL SETTING:** For this to work, you must log into the Cloudinary Console -> Settings -> Security -> and ensure **"Allow delivery of PDF and ZIP files"** is toggled **ON**. If this is off, all resumes will return a 401 error.
-
----
-
-## ✉️ Email Notification System (Nodemailer)
-
-The system sends automated, HTML-styled transactional emails for OTPs, Application Approvals, Interview Invites, and Job Offers. 
-
-### Custom Branding (Logo)
-Because webmail clients (like Outlook) have spotty support for WebP images and external URLs can break, the UniJobLink logo is natively embedded into the emails.
-*   **Location:** The logo is stored locally on the backend at `backend/assets/logo.png`. (Converted from WebP to PNG specifically for email compatibility).
-*   **Implementation:** It is attached to the email payload using Nodemailer's Content-ID (CID) feature (`cid:unijoblogo`). 
-*   **Templates:** All 6 email triggers route through a single `wrapTemplate()` function in `mailer.js` for centralized styling.
-
-### Security Note: Password Resets
-The password reset flow is strictly email-based. The backend generates a token but **never** returns it to the frontend UI to prevent account hijacking. The token is exclusively delivered via Nodemailer to the verified user's inbox.
+**Database & Cloud Storage**
+*   **Database:** MySQL (Hosted on Aiven)
+*   **Driver:** `mysql2` (Promise-based)
+*   **File Storage:** Cloudinary (Used for student profile images and PDF resumes)
 
 ---
 
-## 🔒 Environment Variables Reference
+## ⚙️ System Architecture: How It Connects
 
-When setting up this project locally, ensure your `.env` file contains the following keys:
+UniJobLink operates on a decoupled client-server architecture:
 
-**Backend:**
-*   `PORT`
-*   `DATABASE_URL` (Remember: remove the Aiven SSL tag)
-*   `CLOUDINARY_CLOUD_NAME`
-*   `CLOUDINARY_API_KEY`
-*   `CLOUDINARY_API_SECRET`
-*   `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` (For Nodemailer)
-*   `JWT_SECRET`
+1.  **Client-Side Rendering:** The React frontend handles the UI state and routing. It communicates with the backend exclusively via RESTful API endpoints.
+2.  **Authentication Flow:** When a user logs in, the backend verifies credentials against the Aiven MySQL database and issues a secure JWT. This token is passed in the header of subsequent requests to authorize actions based on the user's role.
+3.  **File Management:** When a student uploads a resume, the backend intercepts the file and routes it directly to Cloudinary. Cloudinary returns a secure URL, which the backend then stores in the MySQL database.
+4.  **Notification Pipeline:** Key database updates (e.g., an employer changing an application status to "Offered") trigger the backend's `mailer.js` utility. This utility injects the recipient's data into a custom HTML template (complete with an embedded CID logo) and fires a transactional email via SMTP.
 
-**Frontend:**
-*   `VITE_API_BASE_URL` (Points to Render in Prod, Localhost in Dev)
+---
+
+## 📁 Project Structure: Which File Does What
+
+The repository is split into two independent directories to allow for separate deployments.
+
+### `/frontend` (React + Tailwind)
+*   `src/index.css`: The master styling file. Contains the custom CSS properties for the light/dark mode theme, as well as the structural design tokens (rounded corners, shadows) for core UI elements (`.btn`, `.card`, `.input`, `.modal-panel`).
+*   `src/context/`: Contains global state managers, such as `ThemeContext` (handling the `data-theme="dark"` toggle) and Auth context.
+*   `src/components/`: Reusable UI elements (e.g., Modals, Navigation bars, Cards).
+*   `src/pages/`: The primary views (e.g., Student Dashboard, Login, Forgot Password).
+
+### `/backend` (Node.js + Express)
+*   `server.js`: The entry point. Configures Express, CORS, and mounts the API routes.
+*   `config/database.js`: Establishes the secure SSL connection to the Aiven MySQL database.
+*   `routes/`: Maps URL endpoints to specific controller functions (e.g., `/api/auth/login`).
+*   `controllers/`: The brains of the backend. Contains the business logic for creating users, updating application statuses, and handling Cloudinary uploads.
+*   `utils/mailer.js`: The centralized email dispatcher. Contains the `wrapTemplate()` function that wraps dynamic text into the UniJobLink branded HTML layout and attaches the local logo (`backend/assets/logo.png`) as a MIME CID.
+
+---
+
+## 🚀 Key Engineering Implementations (FYP Highlights)
+
+*   **Secure Password Reset:** Utilizes a magic-link workflow. Tokens are strictly delivered via the email pipeline and never exposed to the frontend UI, preventing account hijacking.
+*   **Dual-Theme UI:** Avoids Tailwind's disconnected `dark:` variant in favor of a robust CSS custom-property system (`--bg`, `--surface`), ensuring instant, flicker-free toggling between light and dark modes.
+*   **Cloudinary PDF Handling:** Overcomes standard cloud storage CORS limitations by uploading resumes with `resource_type: 'image'` and `allowedFormats: ['pdf']`, paired with explicit security delivery toggles in the Cloudinary console.
+*   **Render Sleep Prevention:** Integrates UptimeRobot to ping the backend API every 5 minutes, preventing the free-tier Render instance from spinning down and dropping the Aiven database connection.
