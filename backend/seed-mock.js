@@ -15,14 +15,22 @@
  *   Supervisor: amirah.hassan@ucsiuniversity.edu.my / Supervisor@123  (John + Sarah approved)
  *   Supervisor: wong.ck@ucsiuniversity.edu.my       / Supervisor@123  (Raj + Nurul pending)
  *   Supervisor: farah.idris@ucsiuniversity.edu.my   / Supervisor@123  (no students)
- *   Company: hr@petronasdigital.com.my    / Company@123
- *   Company: internship@grab.com          / Company@123
- *   Company: talent@airasia.com           / Company@123
- *   Company: hr@cimb.com.my              / Company@123
- *   Company: intern@kpj.com.my           / Company@123
- *   Company: hr@proton.com.my            / Company@123
- *   Company: careers@lazada.com.my       / Company@123
- *   Company: intern@maybank.com.my       / Company@123
+ *   Company: hr.petronasdigital@example.com    / Company@123
+ *   Company: internship.grab@example.com       / Company@123
+ *   Company: talent.airasia@example.com        / Company@123
+ *   Company: hr.cimb@example.com               / Company@123
+ *   Company: intern.kpj@example.com            / Company@123
+ *   Company: hr.proton@example.com             / Company@123
+ *   Company: careers.lazada@example.com        / Company@123
+ *   Company: intern.maybank@example.com        / Company@123
+ *
+ * NOTE: company emails intentionally use the example.com domain (RFC 2606 —
+ * permanently reserved, can never resolve to a real mailbox). They used to
+ * be real company domains (grab.com, airasia.com, etc.) which is a real
+ * risk: sendCompanyEmail() in utils/mailer.js fires a live email to
+ * whatever address is on a Company record whenever an offer is
+ * accepted/rejected, so a demo run against real SMTP creds could have
+ * actually emailed those companies.
  */
 
 require('dotenv').config();
@@ -53,56 +61,56 @@ startxref
 
 const COMPANIES = [
   {
-    email: 'hr@petronasdigital.com.my', password: 'Company@123',
+    email: 'hr.petronasdigital@example.com', password: 'Company@123',
     name: 'Petronas Digital Sdn Bhd', ssm: 'PD-198901012345',
     industry: 'Information Technology',
     description: 'Petronas Digital is the digital transformation arm of PETRONAS, Malaysia\'s national oil and gas company. We build world-class data platforms, cloud infrastructure, and digital products serving the energy sector and beyond.',
     website: 'https://www.petronasdigital.com', address: 'KLCC, Kuala Lumpur', companySize: '501-1000', foundedYear: 1989,
   },
   {
-    email: 'internship@grab.com', password: 'Company@123',
+    email: 'internship.grab@example.com', password: 'Company@123',
     name: 'Grab Holdings Sdn Bhd', ssm: 'GH-199301054321',
     industry: 'Information Technology',
     description: 'Grab is Southeast Asia\'s leading superapp, offering ride-hailing, food delivery, logistics, and fintech services across 8 countries with over 9 million driver-partners.',
     website: 'https://www.grab.com', address: 'Petaling Jaya, Selangor', companySize: '1000+', foundedYear: 2012,
   },
   {
-    email: 'talent@airasia.com', password: 'Company@123',
+    email: 'talent.airasia@example.com', password: 'Company@123',
     name: 'AirAsia Digital Sdn Bhd', ssm: 'AA-200001078901',
     industry: 'Information Technology',
     description: 'AirAsia Digital is the tech division of AirAsia Group, building the AirAsia Super App — one of Asia\'s fastest-growing digital lifestyle platforms covering travel, food, and fintech.',
     website: 'https://airasia.com', address: 'Sepang, Selangor', companySize: '201-500', foundedYear: 2000,
   },
   {
-    email: 'hr@cimb.com.my', password: 'Company@123',
+    email: 'hr.cimb@example.com', password: 'Company@123',
     name: 'CIMB Group Holdings Bhd', ssm: 'CG-197601023456',
     industry: 'Finance',
     description: 'CIMB Group is one of ASEAN\'s leading universal banking groups, offering consumer, commercial, and investment banking services across 18 countries.',
     website: 'https://www.cimb.com', address: 'Jalan Stesen Sentral, Kuala Lumpur', companySize: '1000+', foundedYear: 1974,
   },
   {
-    email: 'intern@kpj.com.my', password: 'Company@123',
+    email: 'intern.kpj@example.com', password: 'Company@123',
     name: 'KPJ Healthcare Sdn Bhd', ssm: 'KH-198501056789',
     industry: 'Healthcare',
     description: 'KPJ Healthcare is Malaysia\'s largest private hospital group with 28 specialist hospitals nationwide, offering a comprehensive range of healthcare services.',
     website: 'https://www.kpj.com.my', address: 'Shah Alam, Selangor', companySize: '1000+', foundedYear: 1985,
   },
   {
-    email: 'hr@proton.com.my', password: 'Company@123',
+    email: 'hr.proton@example.com', password: 'Company@123',
     name: 'Proton Holdings Bhd', ssm: 'PH-198301034567',
     industry: 'Engineering',
     description: 'PROTON is Malaysia\'s national car manufacturer and an emerging player in the ASEAN EV market, partnering with Geely to develop next-generation vehicles.',
     website: 'https://www.proton.com', address: 'Shah Alam, Selangor', companySize: '1000+', foundedYear: 1983,
   },
   {
-    email: 'careers@lazada.com.my', password: 'Company@123',
+    email: 'careers.lazada@example.com', password: 'Company@123',
     name: 'Lazada Malaysia Sdn Bhd', ssm: 'LZ-201201078902',
     industry: 'Marketing',
     description: 'Lazada is Southeast Asia\'s leading e-commerce platform, backed by Alibaba Group. We connect millions of buyers and sellers across 6 countries in the region.',
     website: 'https://www.lazada.com.my', address: 'Mont Kiara, Kuala Lumpur', companySize: '501-1000', foundedYear: 2012,
   },
   {
-    email: 'intern@maybank.com.my', password: 'Company@123',
+    email: 'intern.maybank@example.com', password: 'Company@123',
     name: 'Malayan Banking Bhd (Maybank)', ssm: 'MB-196001012222',
     industry: 'Finance',
     description: 'Maybank is Malaysia\'s largest bank and financial group with a presence in 20 countries. We are at the forefront of digital banking transformation in ASEAN.',
@@ -796,14 +804,14 @@ async function seed() {
     console.log('   Supervisor: wong.ck@ucsiuniversity.edu.my       / Supervisor@123 → Raj (PENDING), Nurul (PENDING)');
     console.log('   Supervisor: farah.idris@ucsiuniversity.edu.my   / Supervisor@123 → no students yet');
     console.log('   ─────────────────────────────────────────────');
-    console.log('   Company: hr@petronasdigital.com.my / Company@123');
-    console.log('   Company: internship@grab.com       / Company@123');
-    console.log('   Company: hr@cimb.com.my            / Company@123');
-    console.log('   Company: hr@proton.com.my          / Company@123');
-    console.log('   Company: intern@maybank.com.my     / Company@123');
-    console.log('   Company: careers@lazada.com.my     / Company@123');
-    console.log('   Company: talent@airasia.com        / Company@123');
-    console.log('   Company: intern@kpj.com.my         / Company@123');
+    console.log('   Company: hr.petronasdigital@example.com / Company@123');
+    console.log('   Company: internship.grab@example.com    / Company@123');
+    console.log('   Company: hr.cimb@example.com            / Company@123');
+    console.log('   Company: hr.proton@example.com          / Company@123');
+    console.log('   Company: intern.maybank@example.com     / Company@123');
+    console.log('   Company: careers.lazada@example.com     / Company@123');
+    console.log('   Company: talent.airasia@example.com     / Company@123');
+    console.log('   Company: intern.kpj@example.com         / Company@123');
     console.log('═'.repeat(55) + '\n');
     process.exit(0);
   } catch (err) {

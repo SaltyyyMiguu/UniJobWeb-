@@ -34,7 +34,7 @@ async function seed() {
     // ─── COMPANIES ──────────────────────────────────────────────────────────
     const companiesData = [
       {
-        email: 'hr@petronasdigital.com.my',
+        email: 'hr.petronasdigital@example.com',
         password: 'Company@123',
         name: 'Petronas Digital Sdn Bhd',
         ssm: 'PD-198901012345',
@@ -48,7 +48,7 @@ async function seed() {
         logoKey: 'petronas',
       },
       {
-        email: 'internship@grab.com',
+        email: 'internship.grab@example.com',
         password: 'Company@123',
         name: 'Grab Holdings Sdn Bhd',
         ssm: 'GH-199301054321',
@@ -62,7 +62,7 @@ async function seed() {
         logoKey: 'grab',
       },
       {
-        email: 'talent@airasia.com',
+        email: 'talent.airasia@example.com',
         password: 'Company@123',
         name: 'AirAsia Digital Sdn Bhd',
         ssm: 'AA-200001078901',
@@ -76,7 +76,7 @@ async function seed() {
         logoKey: 'airasia',
       },
       {
-        email: 'hr@cimb.com.my',
+        email: 'hr.cimb@example.com',
         password: 'Company@123',
         name: 'CIMB Group Holdings Bhd',
         ssm: 'CG-197601023456',
@@ -90,7 +90,7 @@ async function seed() {
         logoKey: 'cimb',
       },
       {
-        email: 'intern@kpj.com.my',
+        email: 'intern.kpj@example.com',
         password: 'Company@123',
         name: 'KPJ Healthcare Sdn Bhd',
         ssm: 'KH-198501056789',
@@ -104,7 +104,7 @@ async function seed() {
         logoKey: 'kpj',
       },
       {
-        email: 'careers@lazada.com.my',
+        email: 'careers.lazada@example.com',
         password: 'Company@123',
         name: 'Lazada Malaysia Sdn Bhd',
         ssm: 'LZ-201201078902',
