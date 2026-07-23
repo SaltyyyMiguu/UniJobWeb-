@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { User, Student, Company, Supervisor, EmailOtp } = require('../models');
 const { sendStudentEmail, sendOtpEmail } = require('../utils/mailer');
+const { auditLog } = require('../utils/auditLogger');
 
 const UCSI_EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@ucsiuniversity\.edu\.my$/i;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -184,24 +185,33 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ message: 'Invalid email or password.' });
+    if (!user) {
+      auditLog(`Login Failed - Email: ${email} - Reason: User Not Found`);
+      return res.status(400).json({ message: 'Invalid email or password.' });
+    }
 
     // Soft-delete check
     if (user.isArchived) {
+      auditLog(`Login Failed - Email: ${email} - Reason: Account Deactivated`);
       return res.status(403).json({ message: 'This account has been deactivated. Please contact the admin.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid email or password.' });
+    if (!isMatch) {
+      auditLog(`Login Failed - Email: ${email} - Reason: Invalid Password`);
+      return res.status(400).json({ message: 'Invalid email or password.' });
+    }
 
     if (user.role === 'COMPANY') {
       const company = await Company.findOne({ where: { userId: user.id } });
       if (!company.isVerified) {
+        auditLog(`Login Failed - Email: ${email} - Reason: Company Not Verified`);
         return res.status(403).json({ message: 'Your company account is pending admin verification.' });
       }
     }
 
     const token = generateToken(user);
+    auditLog(`Login Success - User ID: ${user.id} - Role: ${user.role}`);
     res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
     console.error('[Login failed.] DB error:', error);

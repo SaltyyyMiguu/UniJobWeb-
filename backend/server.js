@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan');
 const dotenv = require('dotenv');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
@@ -17,6 +18,15 @@ const app = express();
 // throws or keys every user under the same proxy IP, rate-limiting the
 // whole app as if it were one client.
 app.set('trust proxy', 1);
+
+// ─── HTTP request logging ───────────────────────────────────────────────────
+// Custom format tuned for scanning Render's log stream: method, endpoint,
+// status, response time, and the real client IP. :remote-addr reads req.ip,
+// which Express derives from X-Forwarded-For now that trust proxy is set
+// above — so this reflects the actual client, not Render's edge proxy.
+// Deliberately does NOT log request bodies/headers (no password/token risk).
+app.use(morgan(':method :url :status - :response-time ms - IP: :remote-addr'));
+
 const httpServer = createServer(app);
 
 // Local dev origins stay allowed unconditionally; FRONTEND_URL (the deployed

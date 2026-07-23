@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const { Student, Application, JobPosting, Company, User, ChatRoom, Message, Supervisor, sequelize } = require('../models');
 const cache = require('../utils/cache');
 const { sendCompanyEmail, sendSupervisorEmail } = require('../utils/mailer');
+const { auditLog } = require('../utils/auditLogger');
 const { uploadResume: upload, uploadStudentProfileImage: uploadProfileImageMulter } = require('../utils/cloudinaryUploader');
 
 // ─── GET /api/student/profile ─────────────────────────────────────────────────
@@ -462,6 +463,7 @@ const respondToOffer = async (req, res) => {
       }
       application.status = 'WITHDRAWN';
       await application.save();
+      auditLog(`Application Withdrawn by Student - App ID: ${application.id} - Student ID: ${student.id}`);
       return res.json({ message: 'Application withdrawn.', application });
     }
 
@@ -530,6 +532,8 @@ const respondToOffer = async (req, res) => {
         throw err;
       }
 
+      auditLog(`Application Accepted by Student (Offer) - App ID: ${application.id} - Student ID: ${student.id}`);
+
       // Non-blocking notifications — fired only after the transaction commits,
       // never awaited, always caught (see utils/mailer.js for the internal
       // try/catch too — a dead SMTP server can never break this response).
@@ -568,6 +572,7 @@ const respondToOffer = async (req, res) => {
           .catch(err => console.error('[email] sendCompanyEmail(OFFER_REJECTED) failed:', err.message));
       }
 
+      auditLog(`Application Declined by Student (Offer) - App ID: ${application.id} - Student ID: ${student.id}`);
       return res.json({ message: 'Offer declined.', application });
     }
   } catch (error) {

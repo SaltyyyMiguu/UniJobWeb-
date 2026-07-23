@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const { Company, JobPosting, Application, Student, User, ChatRoom, Message, sequelize } = require('../models');
 const cache = require('../utils/cache');
 const { sendStudentEmail } = require('../utils/mailer');
+const { auditLog } = require('../utils/auditLogger');
 const {
   uploadCompanyProfileImage: uploadProfileImageMulter,
   uploadListingImage: uploadListingImageMulter,
@@ -310,6 +311,7 @@ const updateApplicationStatus = async (req, res) => {
         });
       }
       notifyStudent('INTERVIEW');
+      auditLog(`Application Accepted (Interview Invite) - App ID: ${application.id} - Student ID: ${application.studentId} - By Company ID: ${company.id}`);
       return res.json({ message: 'Candidate invited to interview. Chat room opened.', application });
     }
 
@@ -330,6 +332,7 @@ const updateApplicationStatus = async (req, res) => {
 
       await application.save();
       notifyStudent('OFFER');
+      auditLog(`Application Offer Extended - App ID: ${application.id} - Student ID: ${application.studentId} - By Company ID: ${company.id}`);
       return res.json({ message: `Offer extended. Expires in ${daysUntilExpiry} days.`, application });
     }
 
@@ -385,6 +388,7 @@ const updateApplicationStatus = async (req, res) => {
 
         await t.commit();
 
+        auditLog(`Application Hired - App ID: ${application.id} - Student ID: ${application.studentId} - By Company ID: ${company.id}`);
         return res.json({
           message: 'Candidate hired successfully. Positions decremented.',
           application: lockedApplication,
@@ -409,6 +413,7 @@ const updateApplicationStatus = async (req, res) => {
       );
 
       notifyStudent('REJECTED');
+      auditLog(`Application Rejected - App ID: ${application.id} - Student ID: ${application.studentId} - By Company ID: ${company.id}`);
       return res.json({ message: 'Application rejected.', application });
     }
 

@@ -1,4 +1,5 @@
 const { Supervisor, Student, Application, JobPosting, Company, User } = require('../models');
+const { auditLog } = require('../utils/auditLogger');
 
 // Stage-rank used to compute a student's "highest application stage" for the
 // My Students table — higher index = better/further outcome. Closed-negative
@@ -190,6 +191,7 @@ const approvePlacement = async (req, res) => {
     if (!application) return;
     application.status = 'APPROVED_BY_UNI';
     await application.save();
+    auditLog(`Application Approved - Student ID: ${application.studentId} - By Supervisor ID: ${req.user.id}`);
     res.json({ message: 'Placement approved.', application });
   } catch (error) {
     console.error('[Failed to approve placement.] DB error:', error);
@@ -204,6 +206,7 @@ const rejectPlacement = async (req, res) => {
     if (!application) return;
     application.status = 'REJECTED_BY_UNI';
     await application.save();
+    auditLog(`Application Rejected - Student ID: ${application.studentId} - By Supervisor ID: ${req.user.id}`);
     res.json({ message: 'Placement rejected.', application });
   } catch (error) {
     console.error('[Failed to reject placement.] DB error:', error);
